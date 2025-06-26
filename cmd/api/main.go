@@ -193,10 +193,6 @@ func main() {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
-
-	app.connect()
-
-	// app.login()
 }
 
 func openDB(cfg config) (*sql.DB, error) {

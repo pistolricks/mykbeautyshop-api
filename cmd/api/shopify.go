@@ -4,17 +4,16 @@ import (
 	"context"
 	"fmt"
 	goshopify "github.com/bold-commerce/go-shopify/v4"
+	"net/http"
 )
 
-func (app *application) connect() {
-
-	// redirectUrl := fmt.Sprintf("localhost:4000/%s/callback", app.envars.StoreName)
+func (app *application) listProductsHandler(w http.ResponseWriter, r *http.Request) {
 
 	shopApp := goshopify.App{
 		ApiKey:      app.envars.ShopifyKey,
 		ApiSecret:   app.envars.ShopifySecret,
 		RedirectUrl: "https://example.com/callback",
-		Scope:       "read_products, read_orders",
+		Scope:       "read_products",
 	}
 
 	client, err := goshopify.NewClient(shopApp, app.envars.StoreName, app.envars.ShopifyToken)
@@ -24,7 +23,7 @@ func (app *application) connect() {
 		return
 	}
 
-	numProducts, err := client.Product.Count(context.Background(), nil)
+	count, err := client.Product.Count(context.Background(), nil)
 
 	if err != nil {
 		fmt.Println(err)
@@ -36,7 +35,46 @@ func (app *application) connect() {
 		fmt.Println(err)
 	}
 
-	fmt.Println(numProducts)
-	fmt.Println(products)
+	err = app.writeJSON(w, http.StatusOK, envelope{"products": products, "count": count}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+}
 
+func (app *application) listOrdersHandler(w http.ResponseWriter, r *http.Request) {
+
+	shopApp := goshopify.App{
+		ApiKey:      app.envars.ShopifyKey,
+		ApiSecret:   app.envars.ShopifySecret,
+		RedirectUrl: "https://example.com/callback",
+		Scope:       "read_orders",
+	}
+
+	client, err := goshopify.NewClient(shopApp, app.envars.StoreName, app.envars.ShopifyToken)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	options := struct {
+		Status string `url:"status"`
+	}{"any"}
+
+	count, err := client.Order.Count(context.Background(), options)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	products, err := client.Order.List(context.Background(), options)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"products": products, "count": count}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
 }
