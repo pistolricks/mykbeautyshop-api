@@ -5,15 +5,15 @@ import (
 	"time"
 )
 
-func login(loginUrl string, username string, password string) {
+func (app *application) login() {
 	browser := rod.New().MustConnect().NoDefaultDevice()
-	page := browser.MustPage(loginUrl)
+	page := browser.MustPage(app.envars.LoginUrl)
 
 	page.MustElement("div.static-menu-item").MustClick()
 
-	page.MustElement("#mat-input-0").MustInput(username)
+	page.MustElement("#mat-input-0").MustInput(app.envars.Username)
 
-	page.MustElement("#mat-input-1").MustInput(password)
+	page.MustElement("#mat-input-1").MustInput(app.envars.Password)
 
 	page.MustElement(`[type="submit"]`).MustClick()
 
