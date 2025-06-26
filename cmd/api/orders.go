@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	goshopify "github.com/bold-commerce/go-shopify/v4"
-	"github.com/pistolricks/kbeauty-api/internal/riman"
 	"net/http"
+	"strconv"
 )
 
 /* ORDER STATUS */
@@ -170,11 +170,21 @@ func (app *application) processOrders(w http.ResponseWriter, r *http.Request) {
 
 	p := app.login()
 
+	p.MustWaitStable()
+
 	for i, v := range orders {
 
-		riman.ProcessProducts(p, v.LineItems)
-		fmt.Printf("2+%d =", i)
-
+		for index, v := range orders[i].LineItems {
+			productUrl := fmt.Sprintf("https://mall.riman.com/Werekbeauty/products/%s", orders[i].LineItems[index].SKU)
+			wait := p.MustWaitNavigation()
+			p.MustNavigate(productUrl)
+			wait()
+			fmt.Println(v.SKU)
+			p.MustElement("input.quantity-input").MustSelectAllText().MustInput(strconv.Itoa(orders[i].LineItems[index].Quantity))
+			p.MustWaitStable()
+			p.MustElement("button.add-to-bag-btn").MustElement(`[type="button"]`).MustClick()
+		}
+		fmt.Printf("2+%d =", v.Id)
 	}
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"orders": orders, "count": count}, nil)

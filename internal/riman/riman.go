@@ -8,35 +8,15 @@ import (
 )
 
 func ProcessProducts(page *rod.Page, products []goshopify.LineItem) {
+
 	for i, v := range products {
-
+		productUrl := fmt.Sprintf("https://mall.riman.com/Werekbeauty/products/%s", products[i].SKU)
 		wait := page.MustWaitNavigation()
-
-		OpenProductPage(page, v.SKU)
-
+		page.MustNavigate(productUrl)
 		wait()
-
+		fmt.Println(v.SKU)
 		page.MustElement("input.quantity-input").MustSelectAllText().MustInput(strconv.Itoa(products[i].Quantity))
 		page.MustWaitStable()
-		AddToCart(page)
-
-		fmt.Printf("2+%d =", i)
-
+		page.MustElement("button.add-to-bag-btn").MustClick()
 	}
-}
-
-func OpenProductPage(page *rod.Page, productID string) {
-
-	productUrl := fmt.Sprintf("https://mall.riman.com/Werekbeauty/products/%s", productID)
-
-	page.MustNavigate(productUrl).MustWaitStable()
-
-}
-
-func AddToCart(page *rod.Page) {
-
-	page.MustElement("button.add-to-bag-btn").MustClick()
-
-	/*	page.MustWaitStable().MustScreenshot("a.png") */
-
 }
