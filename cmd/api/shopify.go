@@ -31,14 +31,13 @@ func (app *application) connect() {
 		return
 	}
 
-	// productListings, err := client.Product.List(context.Background(), nil)
+	productListings, err := client.Product.List(context.Background(), nil)
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	fmt.Println(numProducts)
-
-	// fmt.Println(productListings)
+	fmt.Println(productListings)
 
 }
