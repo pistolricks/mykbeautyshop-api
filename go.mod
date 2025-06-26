@@ -8,6 +8,9 @@ require (
 )
 
 require (
+	github.com/bold-commerce/go-shopify/v4 v4.7.0 // indirect
+	github.com/google/go-querystring v1.0.0 // indirect
+	github.com/shopspring/decimal v0.0.0-20200105231215-408a2507e114 // indirect
 	github.com/ysmood/fetchup v0.2.3 // indirect
 	github.com/ysmood/goob v0.4.0 // indirect
 	github.com/ysmood/got v0.40.0 // indirect

@@ -17,6 +17,7 @@ func login(loginUrl string, username string, password string) {
 
 	page.MustElement(`[type="submit"]`).MustClick()
 
-	page.MustWaitStable().MustScreenshot("a.png")
+	/*	page.MustWaitStable().MustScreenshot("a.png") */
+
 	time.Sleep(time.Hour)
 }
