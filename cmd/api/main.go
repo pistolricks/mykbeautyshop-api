@@ -8,6 +8,7 @@ import (
 )
 
 type Envars struct {
+	StoreName     string
 	LoginUrl      string
 	Username      string
 	Password      string
@@ -18,13 +19,19 @@ type Envars struct {
 
 type application struct {
 	logger *slog.Logger
-	envars Envars
+	envars *Envars
 }
 
 func main() {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("Error loading .env file")
+		return
+	}
+
+	storeName := os.Getenv("STORE_NAME")
+	if storeName == "" {
+		fmt.Println("missing store name")
 		return
 	}
 
@@ -61,16 +68,21 @@ func main() {
 	shopifySecret := os.Getenv("SHOPIFY_SECRET")
 	if shopifySecret == "" {
 		fmt.Println("missing shop secret")
+		return
 	}
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	Vars := Envars{loginUrl, username, password, shopifyToken, shopifyKey, shopifySecret}
+	vars := &Envars{StoreName: storeName, LoginUrl: loginUrl, Username: username, Password: password, ShopifyToken: shopifyToken, ShopifyKey: shopifyKey, ShopifySecret: shopifySecret}
+
+	fmt.Println(vars)
 
 	app := &application{
 		logger: logger,
-		envars: Vars,
+		envars: vars,
 	}
 
-	app.login()
+	app.setup()
+
+	// app.login()
 }
