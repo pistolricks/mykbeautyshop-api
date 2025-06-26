@@ -17,6 +17,10 @@ func (app *application) routes() http.Handler {
 
 	router.HandlerFunc(http.MethodGet, "/v1/products", app.listProductsHandler)
 	router.HandlerFunc(http.MethodGet, "/v1/orders", app.listOrdersHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/orders/:status", app.listOrdersByStatusHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/orders/:status/status/:fulfillment_status", app.listOrdersByAllStatusValuesHandler)
+
+	router.HandlerFunc(http.MethodGet, "/v1/process/orders", app.processAllOpenUnfulfilledOrders)
 	
 	/*
 		router.HandlerFunc(http.MethodPost, "/v1/users", app.registerUserHandler)

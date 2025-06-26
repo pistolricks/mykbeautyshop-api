@@ -13,6 +13,11 @@ import (
 	"strings"
 )
 
+func (app *application) readStringParam(key string, r *http.Request) string {
+	params := httprouter.ParamsFromContext(r.Context())
+	return params.ByName(key)
+}
+
 func (app *application) readIDParam(r *http.Request) (int64, error) {
 	params := httprouter.ParamsFromContext(r.Context())
 
