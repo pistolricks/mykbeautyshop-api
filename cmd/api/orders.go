@@ -182,7 +182,7 @@ func (app *application) processOrders(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(v.SKU)
 			p.MustElement("input.quantity-input").MustSelectAllText().MustInput(strconv.Itoa(orders[i].LineItems[index].Quantity))
 			p.MustWaitStable()
-			p.MustElement("button.add-to-bag-btn").MustElement(`[type="button"]`).MustClick()
+			// p.MustElement("button.add-to-bag-btn").MustElement(`[type="button"]`).MustClick()
 		}
 		fmt.Printf("2+%d =", v.Id)
 	}
