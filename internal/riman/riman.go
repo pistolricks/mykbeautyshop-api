@@ -16,7 +16,9 @@ func ProcessProducts(page *rod.Page, products []goshopify.LineItem) {
 
 		wait()
 
-		AddToCart(page, strconv.Itoa(products[i].Quantity))
+		page.MustElement("input.quantity-input").MustSelectAllText().MustInput(strconv.Itoa(products[i].Quantity))
+		page.MustWaitStable()
+		AddToCart(page)
 
 		fmt.Printf("2+%d =", i)
 
@@ -31,9 +33,7 @@ func OpenProductPage(page *rod.Page, productID string) {
 
 }
 
-func AddToCart(page *rod.Page, quantity string) {
-
-	page.MustElement("input.quantity-input").MustInput(quantity)
+func AddToCart(page *rod.Page) {
 
 	page.MustElement("button.add-to-bag-btn").MustClick()
 
