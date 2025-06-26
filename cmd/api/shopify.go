@@ -14,7 +14,7 @@ func (app *application) connect() {
 		ApiKey:      app.envars.ShopifyKey,
 		ApiSecret:   app.envars.ShopifySecret,
 		RedirectUrl: "https://example.com/callback",
-		Scope:       "read_products, read_product_listings",
+		Scope:       "read_products, read_orders",
 	}
 
 	client, err := goshopify.NewClient(shopApp, app.envars.StoreName, app.envars.ShopifyToken)
@@ -31,13 +31,12 @@ func (app *application) connect() {
 		return
 	}
 
-	productListings, err := client.Product.List(context.Background(), nil)
-
+	products, err := client.Product.List(context.Background(), nil)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	fmt.Println(numProducts)
-	fmt.Println(productListings)
+	fmt.Println(products)
 
 }
