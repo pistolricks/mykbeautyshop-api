@@ -82,7 +82,7 @@ func main() {
 		envars: vars,
 	}
 
-	app.setup()
+	app.connect()
 
 	// app.login()
 }

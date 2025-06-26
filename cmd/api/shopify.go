@@ -6,7 +6,7 @@ import (
 	goshopify "github.com/bold-commerce/go-shopify/v4"
 )
 
-func (app *application) setup() {
+func (app *application) connect() {
 
 	// redirectUrl := fmt.Sprintf("localhost:4000/%s/callback", app.envars.StoreName)
 
@@ -14,7 +14,7 @@ func (app *application) setup() {
 		ApiKey:      app.envars.ShopifyKey,
 		ApiSecret:   app.envars.ShopifySecret,
 		RedirectUrl: "https://example.com/callback",
-		Scope:       "read_products",
+		Scope:       "read_products, read_product_listings",
 	}
 
 	client, err := goshopify.NewClient(shopApp, app.envars.StoreName, app.envars.ShopifyToken)
@@ -31,6 +31,14 @@ func (app *application) setup() {
 		return
 	}
 
+	productListings, err := client.Product.List(context.Background(), nil)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	fmt.Println(numProducts)
+
+	fmt.Println(productListings)
 
 }
