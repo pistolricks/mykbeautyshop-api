@@ -1,4 +1,4 @@
-## include .env
+include .env
 
 # ==================================================================================== #
 # HELPERS
@@ -28,22 +28,28 @@ run/api:
 run/api/rod:
 	go run ./cmd/api -rod=show,devtools
 
+## run/api: run the cmd/api application
+.PHONY: run/api
+run/api:
+	go run ./cmd/api -db-dsn=${GREENLIGHT_DB_DSN}
+
 ## db/psql: connect to the database using psql
 .PHONY: db/psql
 db/psql:
-	psql ${GOOSE_DBSTRING}
+	psql ${GREENLIGHT_DB_DSN}
 
 ## db/migrations/new name=$1: create a new database migration
 .PHONY: db/migrations/new
 db/migrations/new:
 	@echo 'Creating migration files for ${name}...'
-	goose create -seq -ext=.sql -dir=./migrations ${name}
+	migrate create -seq -ext=.sql -dir=./migrations ${name}
 
 ## db/migrations/up: apply all up database migrations
 .PHONY: db/migrations/up
 db/migrations/up: confirm
 	@echo 'Running up migrations...'
-	 goose -path ./migrations -database ${GOOSE_DBSTRING} up
+	migrate -path ./migrations -database ${GREENLIGHT_DB_DSN} up
+
 
 # ==================================================================================== #
 # QUALITY CONTROL
