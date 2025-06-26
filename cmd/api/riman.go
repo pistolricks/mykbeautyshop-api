@@ -2,10 +2,9 @@ package main
 
 import (
 	"github.com/go-rod/rod"
-	"time"
 )
 
-func (app *application) login() {
+func (app *application) login() *rod.Page {
 	browser := rod.New().MustConnect().NoDefaultDevice()
 	page := browser.MustPage(app.envars.LoginUrl)
 
@@ -19,5 +18,7 @@ func (app *application) login() {
 
 	/*	page.MustWaitStable().MustScreenshot("a.png") */
 
-	time.Sleep(time.Hour)
+	// time.Sleep(time.Hour)
+
+	return page
 }

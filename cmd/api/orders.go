@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	goshopify "github.com/bold-commerce/go-shopify/v4"
+	"github.com/pistolricks/kbeauty-api/internal/riman"
 	"net/http"
 )
 
@@ -135,7 +136,7 @@ func (app *application) listOrdersByAllStatusValuesHandler(w http.ResponseWriter
 	}
 }
 
-func (app *application) processAllOpenUnfulfilledOrders(w http.ResponseWriter, r *http.Request) {
+func (app *application) processOrders(w http.ResponseWriter, r *http.Request) {
 
 	shopApp := goshopify.App{
 		ApiKey:      app.envars.ShopifyKey,
@@ -157,7 +158,6 @@ func (app *application) processAllOpenUnfulfilledOrders(w http.ResponseWriter, r
 	}{"open", "unfulfilled"}
 
 	count, err := client.Order.Count(context.Background(), options)
-
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -166,6 +166,15 @@ func (app *application) processAllOpenUnfulfilledOrders(w http.ResponseWriter, r
 	orders, err := client.Order.List(context.Background(), options)
 	if err != nil {
 		fmt.Println(err)
+	}
+
+	p := app.login()
+
+	for i, v := range orders {
+
+		riman.ProcessProducts(p, v.LineItems)
+		fmt.Printf("2+%d =", i)
+
 	}
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"orders": orders, "count": count}, nil)

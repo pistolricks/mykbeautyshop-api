@@ -1,9 +1,23 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"github.com/go-rod/rod"
 	"net/http"
 )
+
+func (app *application) handleRodError(err error) {
+	var evalErr *rod.EvalError
+	if errors.Is(err, context.DeadlineExceeded) { // timeout error
+		fmt.Println("timeout err")
+	} else if errors.As(err, &evalErr) { // eval error
+		fmt.Println(evalErr.LineNumber)
+	} else if err != nil {
+		fmt.Println("can't handle", err)
+	}
+}
 
 func (app *application) logError(r *http.Request, err error) {
 	var (

@@ -27,7 +27,7 @@ run/api:
 ## run/api: run the cmd/api application
 .PHONY: run/api/rod
 run/api/rod:
-	go run ./cmd/api -rod=show,devtools
+	go run ./cmd/api -rod=show,devtools -db-dsn=${GREENLIGHT_DB_DSN}
 
 ## run/api: run the cmd/api application
 .PHONY: run/api
