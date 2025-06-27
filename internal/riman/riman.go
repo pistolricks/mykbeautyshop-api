@@ -7,6 +7,22 @@ import (
 	"strconv"
 )
 
+func Login(loginUrl string, username string, password string) *rod.Page {
+	browser := rod.New().MustConnect().NoDefaultDevice()
+
+	page := browser.MustPage(loginUrl)
+
+	page.MustElement("div.static-menu-item").MustClick()
+	page.MustElement("#mat-input-0").MustInput(username)
+	page.MustElement("#mat-input-1").MustInput(password)
+	page.MustElement(`[type="submit"]`).MustClick()
+
+	/*	page.MustWaitStable().MustScreenshot("a.png") */
+	// time.Sleep(time.Hour)
+
+	return page
+}
+
 func ProcessOrders(loginUrl string, username string, password string, orders []goshopify.Order) {
 	orderCount := len(orders)
 
@@ -22,14 +38,7 @@ func ProcessOrders(loginUrl string, username string, password string, orders []g
 
 func SubmitOrder(loginUrl string, username string, password string, order goshopify.Order) {
 
-	browser := rod.New().MustConnect().NoDefaultDevice()
-
-	page := browser.MustPage(loginUrl)
-
-	page.MustElement("div.static-menu-item").MustClick()
-	page.MustElement("#mat-input-0").MustInput(username)
-	page.MustElement("#mat-input-1").MustInput(password)
-	page.MustElement(`[type="submit"]`).MustClick()
+	page := Login(loginUrl, username, password)
 
 	for _, product := range order.LineItems {
 		productUrl := fmt.Sprintf("https://mall.riman.com/Werekbeauty/products/%s", product.SKU)
