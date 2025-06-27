@@ -166,15 +166,16 @@ func (app *application) processOrders(w http.ResponseWriter, r *http.Request) {
 	orders, err := client.Order.List(context.Background(), options)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 
-	for i, order := range orders {
-		riman.SubmitOrder(app.envars.LoginUrl, app.envars.Username, app.envars.Password, order)
-		fmt.Printf("%d", i)
-	}
+	app.background(func() {
+		riman.ProcessOrders(app.envars.LoginUrl, app.envars.Username, app.envars.Password, orders)
+	})
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"orders": orders, "count": count}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
+
 }
