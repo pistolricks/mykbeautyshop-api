@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	goshopify "github.com/bold-commerce/go-shopify/v4"
-	"github.com/pistolricks/kbeauty-api/internal/riman"
 	"net/http"
 )
 
@@ -170,7 +169,7 @@ func (app *application) processOrders(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.background(func() {
-		riman.ProcessOrders(app.envars.LoginUrl, app.envars.Username, app.envars.Password, orders)
+		app.ProcessOrders(app.envars.LoginUrl, app.envars.Username, app.envars.Password, orders)
 	})
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"orders": orders, "count": count}, nil)
