@@ -38,18 +38,33 @@ func ProcessOrders(loginUrl string, username string, password string, orders []g
 
 func SubmitOrder(loginUrl string, username string, password string, order goshopify.Order) {
 
-	page := Login(loginUrl, username, password)
+	browser := rod.New().MustConnect().NoDefaultDevice()
 
-	for _, product := range order.LineItems {
+	page := browser.MustPage(loginUrl)
+
+	page.MustElement("div.static-menu-item").MustClick()
+	page.MustElement("#mat-input-0").MustInput(username)
+	page.MustElement("#mat-input-1").MustInput(password)
+	page.MustElement(`[type="submit"]`).MustClick()
+
+	count := len(order.LineItems)
+
+	for i, product := range order.LineItems {
 		productUrl := fmt.Sprintf("https://mall.riman.com/Werekbeauty/products/%s", product.SKU)
 		wait := page.MustWaitNavigation()
 		page.MustNavigate(productUrl)
 		wait()
 
 		page.MustElement("input.quantity-input").MustSelectAllText().MustInput(strconv.Itoa(product.Quantity))
-
 		page.MustElement("button.add-to-bag-btn").MustClick()
 		page.MustWaitStable()
-		page.MustElement("div.cart-btn").MustClick()
+
+		switch {
+		case i < count-1:
+			page.MustElement("div.cart-btn").MustClick()
+		case i == count-1:
+			page.MustNavigate("https://mall.riman.com/checkout")
+		}
+
 	}
 }
