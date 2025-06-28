@@ -142,6 +142,8 @@ type StateObject = struct {
 	name2 any
 }
 
+/* TODO: REMOVE HARD CODED EMAIL */
+
 func shippingInfo(page *rod.Page, checkoutUrl string, order goshopify.Order) {
 	wait := page.MustWaitNavigation()
 	page.MustNavigate(checkoutUrl)
@@ -162,7 +164,7 @@ func shippingInfo(page *rod.Page, checkoutUrl string, order goshopify.Order) {
 	zip := strings.TrimSpace(shippingAddress.Zip)
 
 	phone := strings.Replace(strings.TrimSpace(shippingAddress.Phone), "+1", "", 1)
-	email := strings.TrimSpace(order.Email)
+	// email := strings.TrimSpace(order.Email)
 
 	page.MustElement("#firstName0").MustSelectAllText().MustInput(firstName)
 	page.MustElement("#lastName0").MustSelectAllText().MustInput(lastName)
@@ -172,9 +174,11 @@ func shippingInfo(page *rod.Page, checkoutUrl string, order goshopify.Order) {
 	removedProvince := strings.Replace(removedCity, province, "", 1)
 	removedProvinceCode := strings.Replace(removedProvince, provinceCode, "", 1)
 	removedZip := strings.Replace(removedProvinceCode, zip, "", 1)
-	formatted1 := strings.Replace(removedZip, shortZip, "", 1)
+	lineAddress := strings.Replace(removedZip, shortZip, "", 1)
 
-	address := fmt.Sprintf("%s %s, %s", formatted1, address2, zip)
+	formattedAddress := strings.TrimSpace(lineAddress)
+
+	address := fmt.Sprintf("%s %s, %s", formattedAddress, address2, zip)
 
 	page.MustElement("#address10").MustSelectAllText().MustInput(address)
 	page.MustElement("#address20").MustSelectAllText().MustInput(company)
@@ -184,7 +188,7 @@ func shippingInfo(page *rod.Page, checkoutUrl string, order goshopify.Order) {
 	page.MustElement("#postalCode0").MustSelectAllText().MustInput(zip)
 
 	page.MustElement("#phoneNumber0").MustSelectAllText().MustInput(phone)
-	page.MustElement("#email0").MustSelectAllText().MustInput(email)
+	page.MustElement("#email0").MustSelectAllText().MustInput("embreday9@gmail.com")
 
 	/* Need to add Province/State */
 	// page.MustElement("#state0").MustSelectAllText().MustInput(province)
