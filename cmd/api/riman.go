@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/go-rod/rod/lib/devices"
 	"strconv"
+	"strings"
 
 	goshopify "github.com/bold-commerce/go-shopify/v4"
 	"github.com/go-rod/rod"
@@ -10,7 +12,7 @@ import (
 )
 
 func Login(loginUrl string, username string, password string) *rod.Page {
-	browser := rod.New().MustConnect().NoDefaultDevice()
+	browser := rod.New().MustConnect().DefaultDevice(devices.LaptopWithHiDPIScreen)
 
 	page := browser.MustPage(loginUrl)
 
@@ -40,7 +42,7 @@ func (app *application) ProcessOrders(loginUrl string, username string, password
 
 func (app *application) SubmitOrder(loginUrl string, username string, password string, order goshopify.Order) {
 
-	browser := rod.New().MustConnect().NoDefaultDevice()
+	browser := rod.New().MustConnect().DefaultDevice(devices.LaptopWithHiDPIScreen)
 
 	page := browser.MustPage(loginUrl)
 
@@ -134,6 +136,12 @@ func (app *application) processShipping(page *rod.Page, cookies []*proto.Network
 
 }
 
+type StateObject = struct {
+	Code  string
+	Name  string
+	name2 any
+}
+
 func shippingInfo(page *rod.Page, checkoutUrl string, order goshopify.Order) {
 	wait := page.MustWaitNavigation()
 	page.MustNavigate(checkoutUrl)
@@ -144,19 +152,25 @@ func shippingInfo(page *rod.Page, checkoutUrl string, order goshopify.Order) {
 	page.MustElement("#firstName0").MustSelectAllText().MustInput(shippingAddress.FirstName)
 	page.MustElement("#lastName0").MustSelectAllText().MustInput(shippingAddress.LastName)
 
-	address := fmt.Sprintf("%s, %s, %s, %s", shippingAddress.Address1, shippingAddress.City, shippingAddress.Province, shippingAddress.Zip)
+	removedAddress2 := strings.Replace(shippingAddress.Address1, shippingAddress.Address2, "", 1)
+	removedCity := strings.Replace(removedAddress2, shippingAddress.City, "", 1)
+	removedProvince := strings.Replace(removedCity, shippingAddress.Province, "", 1)
+	removedProvinceCode := strings.Replace(removedProvince, shippingAddress.ProvinceCode, "", 1)
+	formatted1 := strings.Replace(removedProvinceCode, shippingAddress.Zip, "", 1)
+
+	address := fmt.Sprintf("%s %s, %s", formatted1, shippingAddress.Address2, shippingAddress.Zip)
 
 	page.MustElement("#address10").MustSelectAllText().MustInput(address)
+	page.MustElement("#address20").MustSelectAllText().MustInput(shippingAddress.Company)
 
-	page.MustElement("#address20").MustSelectAllText().MustInput(shippingAddress.Address1)
-	page.MustElement("#city0").MustSelectAllText().MustInput(shippingAddress.City)
 	/* Need to add Province/State */
-	page.MustElement("#state0").MustSelect(shippingAddress.Province)
-
+	page.MustElement("#city0").MustSelectAllText().MustInput(shippingAddress.City)
 	// page.MustElement("#state0").MustSelectAllText().MustInput(shippingAddress.Province)
-
 	page.MustElement("#postalCode0").MustSelectAllText().MustInput(shippingAddress.Zip)
-	page.MustElement("#phoneNumber0").MustSelectAllText().MustInput(shippingAddress.Phone)
+
+	formatted := strings.Replace(shippingAddress.Phone, "+1", "", 1)
+	page.MustElement("#phoneNumber0").MustSelectAllText().MustInput(formatted)
+
 	page.MustElement("#email0").MustSelectAllText().MustInput(order.Email)
 
 }
