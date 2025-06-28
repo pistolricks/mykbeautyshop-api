@@ -149,28 +149,43 @@ func shippingInfo(page *rod.Page, checkoutUrl string, order goshopify.Order) {
 
 	shippingAddress := order.ShippingAddress
 
-	page.MustElement("#firstName0").MustSelectAllText().MustInput(shippingAddress.FirstName)
-	page.MustElement("#lastName0").MustSelectAllText().MustInput(shippingAddress.LastName)
+	firstName := strings.TrimSpace(shippingAddress.FirstName)
+	lastName := strings.TrimSpace(shippingAddress.LastName)
 
-	removedAddress2 := strings.Replace(shippingAddress.Address1, shippingAddress.Address2, "", 1)
-	removedCity := strings.Replace(removedAddress2, shippingAddress.City, "", 1)
-	removedProvince := strings.Replace(removedCity, shippingAddress.Province, "", 1)
-	removedProvinceCode := strings.Replace(removedProvince, shippingAddress.ProvinceCode, "", 1)
-	formatted1 := strings.Replace(removedProvinceCode, shippingAddress.Zip, "", 1)
+	address1 := strings.TrimSpace(shippingAddress.Address1)
+	address2 := strings.TrimSpace(shippingAddress.Address2)
+	company := strings.TrimSpace(shippingAddress.Company)
+	city := strings.TrimSpace(shippingAddress.City)
+	province := strings.TrimSpace(shippingAddress.Province)
+	provinceCode := strings.TrimSpace(shippingAddress.ProvinceCode)
+	shortZip := strings.TrimSpace(shippingAddress.Zip[:5])
+	zip := strings.TrimSpace(shippingAddress.Zip)
 
-	address := fmt.Sprintf("%s %s, %s", formatted1, shippingAddress.Address2, shippingAddress.Zip)
+	phone := strings.Replace(strings.TrimSpace(shippingAddress.Phone), "+1", "", 1)
+	email := strings.TrimSpace(order.Email)
+
+	page.MustElement("#firstName0").MustSelectAllText().MustInput(firstName)
+	page.MustElement("#lastName0").MustSelectAllText().MustInput(lastName)
+
+	removedAddress2 := strings.Replace(address1, address2, "", 1)
+	removedCity := strings.Replace(removedAddress2, city, "", 1)
+	removedProvince := strings.Replace(removedCity, province, "", 1)
+	removedProvinceCode := strings.Replace(removedProvince, provinceCode, "", 1)
+	removedZip := strings.Replace(removedProvinceCode, zip, "", 1)
+	formatted1 := strings.Replace(removedZip, shortZip, "", 1)
+
+	address := fmt.Sprintf("%s %s, %s", formatted1, address2, zip)
 
 	page.MustElement("#address10").MustSelectAllText().MustInput(address)
-	page.MustElement("#address20").MustSelectAllText().MustInput(shippingAddress.Company)
+	page.MustElement("#address20").MustSelectAllText().MustInput(company)
+
+	page.MustElement("#city0").MustSelectAllText().MustInput(city)
+	// page.MustElement("#state0").MustSelect(provinceCode)
+	page.MustElement("#postalCode0").MustSelectAllText().MustInput(zip)
+
+	page.MustElement("#phoneNumber0").MustSelectAllText().MustInput(phone)
+	page.MustElement("#email0").MustSelectAllText().MustInput(email)
 
 	/* Need to add Province/State */
-	page.MustElement("#city0").MustSelectAllText().MustInput(shippingAddress.City)
-	// page.MustElement("#state0").MustSelectAllText().MustInput(shippingAddress.Province)
-	page.MustElement("#postalCode0").MustSelectAllText().MustInput(shippingAddress.Zip)
-
-	formatted := strings.Replace(shippingAddress.Phone, "+1", "", 1)
-	page.MustElement("#phoneNumber0").MustSelectAllText().MustInput(formatted)
-
-	page.MustElement("#email0").MustSelectAllText().MustInput(order.Email)
-
+	// page.MustElement("#state0").MustSelectAllText().MustInput(province)
 }
