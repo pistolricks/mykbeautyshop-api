@@ -80,7 +80,7 @@ func (app *application) SubmitOrder(loginUrl string, username string, password s
 				return
 			}
 
-			app.cookieServer(page, cookies)
+			app.processShipping(page, cookies, order)
 
 		}
 
@@ -107,7 +107,7 @@ func networkCookies(cookies []*proto.NetworkCookie) []*proto.NetworkCookieParam 
 	return networkCookie
 }
 
-func (app *application) cookieServer(page *rod.Page, cookies []*proto.NetworkCookie) {
+func (app *application) processShipping(page *rod.Page, cookies []*proto.NetworkCookie, order goshopify.Order) {
 
 	app.background(func() {
 
@@ -123,7 +123,7 @@ func (app *application) cookieServer(page *rod.Page, cookies []*proto.NetworkCoo
 
 				checkoutUrl := fmt.Sprintf("https://mall.riman.com/checkout/shipping?cartKey=%s", cartValue)
 
-				shippingInfo(page, checkoutUrl)
+				shippingInfo(page, checkoutUrl, order)
 
 			default:
 				fmt.Println("not right cookie")
@@ -134,8 +134,29 @@ func (app *application) cookieServer(page *rod.Page, cookies []*proto.NetworkCoo
 
 }
 
-func shippingInfo(page *rod.Page, checkoutUrl string) {
+func shippingInfo(page *rod.Page, checkoutUrl string, order goshopify.Order) {
 	wait := page.MustWaitNavigation()
 	page.MustNavigate(checkoutUrl)
 	wait()
+
+	shippingAddress := order.ShippingAddress
+
+	page.MustElement("#firstName0").MustSelectAllText().MustInput(shippingAddress.FirstName)
+	page.MustElement("#lastName0").MustSelectAllText().MustInput(shippingAddress.LastName)
+
+	address := fmt.Sprintf("%s, %s, %s, %s", shippingAddress.Address1, shippingAddress.City, shippingAddress.Province, shippingAddress.Zip)
+
+	page.MustElement("#address10").MustSelectAllText().MustInput(address)
+
+	page.MustElement("#address20").MustSelectAllText().MustInput(shippingAddress.Address1)
+	page.MustElement("#city0").MustSelectAllText().MustInput(shippingAddress.City)
+	/* Need to add Province/State */
+	page.MustElement("#state0").MustSelect(shippingAddress.Province)
+
+	// page.MustElement("#state0").MustSelectAllText().MustInput(shippingAddress.Province)
+
+	page.MustElement("#postalCode0").MustSelectAllText().MustInput(shippingAddress.Zip)
+	page.MustElement("#phoneNumber0").MustSelectAllText().MustInput(shippingAddress.Phone)
+	page.MustElement("#email0").MustSelectAllText().MustInput(order.Email)
+
 }
