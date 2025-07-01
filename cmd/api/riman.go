@@ -178,7 +178,7 @@ func shippingInfo(page *rod.Page, checkoutUrl string, order goshopify.Order) {
 
 	formattedAddress := strings.TrimSpace(lineAddress)
 
-	address := fmt.Sprintf("%s %s, %s", formattedAddress, address2, zip)
+	address := fmt.Sprintf("%s %s, %s", formattedAddress, address2, shortZip)
 
 	page.MustElement("#address10").MustSelectAllText().MustInput(address)
 	page.MustElement("#address20").MustSelectAllText().MustInput(company)
