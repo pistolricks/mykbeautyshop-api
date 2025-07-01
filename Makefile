@@ -20,11 +20,6 @@ confirm:
 # ==================================================================================== #
 
 ## run/api: run the cmd/api application
-.PHONY: run/api
-run/api:
-	go run ./cmd/api
-
-## run/api: run the cmd/api application
 .PHONY: run/api/rod
 run/api/rod:
 	go run ./cmd/api -rod=show,devtools -db-dsn=${GREENLIGHT_DB_DSN}
