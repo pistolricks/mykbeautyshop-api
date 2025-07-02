@@ -111,6 +111,33 @@ func (app *application) listOrdersByAllStatusValuesHandler(w http.ResponseWriter
 	}
 }
 
+func (app *application) processOrder(w http.ResponseWriter, r *http.Request) {
+
+	var input struct {
+		Orders []goshopify.Order `json:"orders"`
+	}
+
+	err := app.readJSON(w, r, &input)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	orders := input.Orders
+
+	count := len(input.Orders)
+
+	app.background(func() {
+		app.ProcessOrders(app.envars.LoginUrl, app.envars.Username, app.envars.Password, orders)
+	})
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"orders": input.Orders, "count": count}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+
+}
+
 func (app *application) processOrders(w http.ResponseWriter, r *http.Request) {
 
 	shopApp := goshopify.App{
