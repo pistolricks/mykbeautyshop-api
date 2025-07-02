@@ -26,6 +26,7 @@ type Envars struct {
 	ShopifyToken  string
 	ShopifyKey    string
 	ShopifySecret string
+	Token         string
 }
 
 var (
@@ -116,6 +117,12 @@ func main() {
 		return
 	}
 
+	token := os.Getenv("TOKEN")
+	if token == "" {
+		fmt.Println("missing token")
+		return
+	}
+
 	var cfg config
 
 	flag.IntVar(&cfg.port, "port", 4000, "API server port")
@@ -176,7 +183,7 @@ func main() {
 		return time.Now().Unix()
 	}))
 
-	vars := &Envars{StoreName: storeName, LoginUrl: loginUrl, Username: username, Password: password, ShopifyToken: shopifyToken, ShopifyKey: shopifyKey, ShopifySecret: shopifySecret}
+	vars := &Envars{StoreName: storeName, LoginUrl: loginUrl, Username: username, Password: password, ShopifyToken: shopifyToken, ShopifyKey: shopifyKey, ShopifySecret: shopifySecret, Token: token}
 
 	fmt.Println(vars)
 

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/go-rod/rod/lib/devices"
+	"net/http"
 	"strconv"
 	"strings"
 
@@ -11,7 +12,23 @@ import (
 	"github.com/go-rod/rod/lib/proto"
 )
 
-func (app *application) RimanLogin(loginUrl string, username string, password string) *rod.Page {
+func (app *application) RimanLoginHandler(w http.ResponseWriter, r *http.Request) {
+	page, browser := app.RimanLogin(app.envars.LoginUrl, app.envars.Username, app.envars.Password)
+
+	cookies := browser.MustGetCookies()
+
+	networkCookie := networkCookies(cookies)
+
+	page.MustSetCookies(networkCookie...)
+
+	err := app.writeJSON(w, http.StatusOK, envelope{"page": page, "cookies": networkCookie}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+
+}
+
+func (app *application) RimanLogin(loginUrl string, username string, password string) (*rod.Page, *rod.Browser) {
 	browser := rod.New().MustConnect().DefaultDevice(devices.LaptopWithHiDPIScreen)
 
 	page := browser.MustPage(loginUrl)
@@ -24,7 +41,7 @@ func (app *application) RimanLogin(loginUrl string, username string, password st
 	/*	page.MustWaitStable().MustScreenshot("a.png") */
 	// time.Sleep(time.Hour)
 
-	return page
+	return page, browser
 }
 
 func (app *application) ProcessOrders(loginUrl string, username string, password string, orders []goshopify.Order) {
