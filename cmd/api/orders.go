@@ -185,6 +185,9 @@ func (app *application) listOrdersHandler(w http.ResponseWriter, r *http.Request
 	input.FinancialStatus = app.readString(qs, "financial_status", "any")
 	input.FulfillmentStatus = app.readString(qs, "fulfillment_status", "any")
 
+	input.Filters.Sort = app.readString(qs, "sort", "id")
+	input.Filters.SortSafelist = []string{"id"}
+
 	options := struct {
 		Status            string `url:"status"`
 		FinancialStatus   string `url:"financial_status"`
