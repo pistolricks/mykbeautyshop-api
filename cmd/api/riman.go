@@ -11,7 +11,7 @@ import (
 	"github.com/go-rod/rod/lib/proto"
 )
 
-func Login(loginUrl string, username string, password string) *rod.Page {
+func (app *application) RimanLogin(loginUrl string, username string, password string) *rod.Page {
 	browser := rod.New().MustConnect().DefaultDevice(devices.LaptopWithHiDPIScreen)
 
 	page := browser.MustPage(loginUrl)
@@ -125,7 +125,7 @@ func (app *application) processShipping(page *rod.Page, cookies []*proto.Network
 
 				checkoutUrl := fmt.Sprintf("https://mall.riman.com/checkout/shipping?cartKey=%s", cartValue)
 
-				shippingInfo(page, checkoutUrl, order)
+				insertShippingInfo(page, checkoutUrl, order)
 
 			default:
 				fmt.Println("not right cookie")
@@ -144,7 +144,7 @@ type StateObject = struct {
 
 /* TODO: REMOVE HARD CODED EMAIL */
 
-func shippingInfo(page *rod.Page, checkoutUrl string, order goshopify.Order) {
+func insertShippingInfo(page *rod.Page, checkoutUrl string, order goshopify.Order) {
 	wait := page.MustWaitNavigation()
 	page.MustNavigate(checkoutUrl)
 	wait()

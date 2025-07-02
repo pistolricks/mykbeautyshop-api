@@ -22,12 +22,12 @@ confirm:
 ## run/api: run the cmd/api application
 .PHONY: run/api/rod
 run/api/rod:
-	go run ./cmd/api -rod=show,devtools -db-dsn=${GREENLIGHT_DB_DSN}
+	go run ./cmd/api -rod=show,devtools -cors-trusted-origins="http://localhost:3000" -db-dsn=${GREENLIGHT_DB_DSN}
 
 ## run/api: run the cmd/api application
 .PHONY: run/api
 run/api:
-	go run ./cmd/api -db-dsn=${GREENLIGHT_DB_DSN}
+	go run ./cmd/api -cors-trusted-origins="http://localhost:3000" -db-dsn=${GREENLIGHT_DB_DSN}
 
 ## db/psql: connect to the database using psql
 .PHONY: db/psql
