@@ -27,12 +27,11 @@ type Token struct {
 
 func generateRidToken(userID int64, ttl time.Duration, scope string, plainText string) (*Token, error) {
 	token := &Token{
-		UserID: userID,
-		Expiry: time.Now().Add(ttl),
-		Scope:  scope,
+		UserID:    userID,
+		Expiry:    time.Now().Add(ttl),
+		Scope:     scope,
+		Plaintext: plainText,
 	}
-
-	token.Plaintext = plainText
 
 	hash := sha256.Sum256([]byte(token.Plaintext))
 	token.Hash = hash[:]

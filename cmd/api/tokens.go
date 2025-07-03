@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"github.com/pistolricks/kbeauty-api/internal/data"
 	"github.com/pistolricks/kbeauty-api/internal/riman"
 	"github.com/pistolricks/kbeauty-api/internal/validator"
@@ -77,6 +78,9 @@ func (app *application) createAuthenticationTokenHandler(w http.ResponseWriter, 
 		return
 	}
 
+	fmt.Println("USER")
+	fmt.Println(user)
+
 	match, err := user.Password.Matches(input.Password)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
@@ -93,11 +97,17 @@ func (app *application) createAuthenticationTokenHandler(w http.ResponseWriter, 
 		Password: input.Password,
 	}
 
+	fmt.Println("CREDENTIALS")
+	fmt.Println(credentials)
+
 	res, err := riman.Login(credentials)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
+
+	fmt.Println("RIMAN LOGIN")
+	fmt.Println(res)
 
 	token, err := app.models.Tokens.NewRid(user.ID, 24*time.Hour, data.ScopeAuthentication, res.Jwt)
 	if err != nil {
@@ -105,7 +115,10 @@ func (app *application) createAuthenticationTokenHandler(w http.ResponseWriter, 
 		return
 	}
 
-	err = app.writeJSON(w, http.StatusCreated, envelope{"authentication_token": token, "auth": res}, nil)
+	fmt.Println("TOKEN")
+	fmt.Println(token)
+
+	err = app.writeJSON(w, http.StatusCreated, envelope{"user": user, "authentication_token": token, "auth": res}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

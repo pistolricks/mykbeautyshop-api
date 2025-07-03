@@ -77,22 +77,23 @@ func (app *application) trackingHandler(w http.ResponseWriter, r *http.Request) 
 	// https://cart-api.riman.com/api/v1/orders/{rid}/shipment-products
 
 	var input struct {
-		Rid string
+		Token   string
+		OrderId string
 		data.Filters
 	}
 
 	qs := r.URL.Query()
-
-	input.Rid = app.readString(qs, "rid", "")
+	input.Token = app.readString(qs, "token", "")
+	input.OrderId = app.readString(qs, "order_id", "")
 
 	u := &url.URL{
 		Scheme: "https",
 		Host:   "cart-api.riman.com",
-		Path:   "/api/v1/orders/" + input.Rid + "/shipment-products",
+		Path:   "/api/v1/orders/" + input.OrderId + "/shipment-products",
 	}
 
 	q := u.Query()
-	q.Add("token", app.envars.Token)
+	q.Add("token", input.Token)
 
 	u.RawQuery = q.Encode()
 
@@ -129,6 +130,17 @@ func (app *application) trackingHandler(w http.ResponseWriter, r *http.Request) 
 
 func (app *application) shippingHandler(w http.ResponseWriter, r *http.Request) {
 
+	var input struct {
+		Rid   string
+		Token string
+		data.Filters
+	}
+
+	qs := r.URL.Query()
+
+	input.Token = app.readString(qs, "token", "")
+	input.Rid = app.readString(qs, "rid", "")
+
 	u := &url.URL{
 		Scheme: "https",
 		Host:   "cart-api.riman.com",
@@ -137,12 +149,12 @@ func (app *application) shippingHandler(w http.ResponseWriter, r *http.Request) 
 
 	q := u.Query()
 
-	q.Add("mainSiteUrl", "2043124962")
+	q.Add("mainSiteUrl", input.Rid)
 	q.Add("offset", "0")
 	q.Add("limit", "40")
 	q.Add("trackingNumber", "")
 	q.Add("orderBy", "-mainOrdersPK")
-	q.Add("token", app.envars.Token)
+	q.Add("token", input.Token)
 
 	u.RawQuery = q.Encode()
 

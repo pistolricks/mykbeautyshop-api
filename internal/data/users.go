@@ -136,6 +136,7 @@ func (m UserModel) GetByEmail(email string) (*User, error) {
 		&user.ID,
 		&user.CreatedAt,
 		&user.Name,
+		&user.UserName,
 		&user.Email,
 		&user.Password.hash,
 		&user.Activated,
