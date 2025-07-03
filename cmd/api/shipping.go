@@ -131,15 +131,14 @@ func (app *application) trackingHandler(w http.ResponseWriter, r *http.Request) 
 func (app *application) shippingHandler(w http.ResponseWriter, r *http.Request) {
 
 	var input struct {
-		Rid   string
-		Token string
+		Token    string
+		UserName string
 		data.Filters
 	}
 
 	qs := r.URL.Query()
-
 	input.Token = app.readString(qs, "token", "")
-	input.Rid = app.readString(qs, "rid", "")
+	input.UserName = app.readString(qs, "userName", "")
 
 	u := &url.URL{
 		Scheme: "https",
@@ -149,10 +148,21 @@ func (app *application) shippingHandler(w http.ResponseWriter, r *http.Request) 
 
 	q := u.Query()
 
-	q.Add("mainSiteUrl", input.Rid)
+	q.Add("mainSiteUrl", input.UserName)
+	q.Add("getEnrollerOrders", "")
+	q.Add("getCustomerOrders", "")
+	q.Add("orderNumber", "")
+	q.Add("shipmentNumber", "")
+	q.Add("trackingNumber", "")
+	q.Add("isRefunded", "")
+	q.Add("paidStatus", "true")
+	q.Add("orderType", "")
+	q.Add("orderLevel", "")
+	q.Add("weChatOrderNumber", "")
+	q.Add("startDate", "")
+	q.Add("endDate", "")
 	q.Add("offset", "0")
 	q.Add("limit", "40")
-	q.Add("trackingNumber", "")
 	q.Add("orderBy", "-mainOrdersPK")
 	q.Add("token", input.Token)
 
