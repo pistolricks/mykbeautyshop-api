@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	goshopify "github.com/bold-commerce/go-shopify/v4"
 	"github.com/pistolricks/kbeauty-api/internal/data"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 )
 
 type RimanOrder struct {
@@ -91,18 +93,28 @@ func (app *application) trackingHandler(w http.ResponseWriter, r *http.Request) 
 		}
 	*/
 	var input struct {
-		Token   string
-		OrderId string
+		Token         string
+		OrderId       string
+		FulfillmentId string
 		data.Filters
 	}
 
 	qs := r.URL.Query()
 	input.Token = app.readString(qs, "token", "")
 	input.OrderId = app.readString(qs, "order_id", "")
+	input.FulfillmentId = app.readString(qs, "fulfillment_id", "")
 
-	tracking := data.OrderUpdateTracking(input.OrderId, input.Token)
+	tracking, _ := data.OrderUpdateTracking(input.OrderId, input.Token)
 
-	err := app.writeJSON(w, http.StatusOK, envelope{"tracking": tracking}, nil)
+	fId, err := strconv.ParseUint(input.FulfillmentId, 10, 64)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fulfillment := goshopify.Fulfillment{
+		Id: fId,
+	}
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"tracking": tracking, "fulfillment": fulfillment}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
