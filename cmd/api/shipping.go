@@ -75,7 +75,21 @@ type RimanOrder struct {
 
 func (app *application) trackingHandler(w http.ResponseWriter, r *http.Request) {
 	// https://cart-api.riman.com/api/v1/orders/{rid}/shipment-products
+	/*
+		shopApp := goshopify.App{
+			ApiKey:      app.envars.ShopifyKey,
+			ApiSecret:   app.envars.ShopifySecret,
+			RedirectUrl: "https://example.com/callback",
+			Scope:       "read_orders",
+		}
 
+		client, err := goshopify.NewClient(shopApp, app.envars.StoreName, app.envars.ShopifyToken)
+
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	*/
 	var input struct {
 		Token   string
 		OrderId string
@@ -86,42 +100,9 @@ func (app *application) trackingHandler(w http.ResponseWriter, r *http.Request) 
 	input.Token = app.readString(qs, "token", "")
 	input.OrderId = app.readString(qs, "order_id", "")
 
-	u := &url.URL{
-		Scheme: "https",
-		Host:   "cart-api.riman.com",
-		Path:   "/api/v1/orders/" + input.OrderId + "/shipment-products",
-	}
+	tracking := data.OrderUpdateTracking(input.OrderId, input.Token)
 
-	q := u.Query()
-	q.Add("token", input.Token)
-
-	u.RawQuery = q.Encode()
-
-	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
-	if err != nil {
-		fmt.Printf("client: could not create request: %s\n", err)
-		os.Exit(1)
-	}
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		fmt.Printf("client: error making http request: %s\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Printf("client: got response!\n")
-	fmt.Printf("client: status code: %d\n", res.StatusCode)
-
-	resBody, err := io.ReadAll(res.Body)
-	if err != nil {
-		fmt.Printf("client: could not read response body: %s\n", err)
-		os.Exit(1)
-	}
-	fmt.Printf("client: response body: %s\n", resBody)
-
-	bodyString := string(resBody)
-
-	err = app.writeJSON(w, http.StatusOK, envelope{"body": bodyString}, nil)
+	err := app.writeJSON(w, http.StatusOK, envelope{"tracking": tracking}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
