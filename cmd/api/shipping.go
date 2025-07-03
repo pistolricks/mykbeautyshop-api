@@ -77,25 +77,28 @@ type RimanOrder struct {
 
 func (app *application) trackingHandler(w http.ResponseWriter, r *http.Request) {
 	// https://cart-api.riman.com/api/v1/orders/{rid}/shipment-products
-	/*
-		shopApp := goshopify.App{
-			ApiKey:      app.envars.ShopifyKey,
-			ApiSecret:   app.envars.ShopifySecret,
-			RedirectUrl: "https://example.com/callback",
-			Scope:       "read_orders",
-		}
 
-		client, err := goshopify.NewClient(shopApp, app.envars.StoreName, app.envars.ShopifyToken)
+	ctx := r.Context()
 
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	*/
+	shopApp := goshopify.App{
+		ApiKey:      app.envars.ShopifyKey,
+		ApiSecret:   app.envars.ShopifySecret,
+		RedirectUrl: "https://example.com/callback",
+		Scope:       "read_orders",
+	}
+
+	client, err := goshopify.NewClient(shopApp, app.envars.StoreName, app.envars.ShopifyToken)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	var input struct {
 		Token         string
 		OrderId       string
 		FulfillmentId string
+		ID            string
 		data.Filters
 	}
 
@@ -103,18 +106,37 @@ func (app *application) trackingHandler(w http.ResponseWriter, r *http.Request) 
 	input.Token = app.readString(qs, "token", "")
 	input.OrderId = app.readString(qs, "order_id", "")
 	input.FulfillmentId = app.readString(qs, "fulfillment_id", "")
-
+	input.ID = app.readString(qs, "id", "")
 	tracking, _ := data.OrderUpdateTracking(input.OrderId, input.Token)
 
 	fId, err := strconv.ParseUint(input.FulfillmentId, 10, 64)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	fulfillment := goshopify.Fulfillment{
-		Id: fId,
+
+	fulfillment := goshopify.Fulfillment{}
+
+	id, err := strconv.ParseUint(input.ID, 10, 64)
+
+	if tracking[0].TrackingNumber == "" {
+		return
+	} else {
+
+		fulfillment = goshopify.Fulfillment{
+			Id:              fId,
+			TrackingUrl:     tracking[0].TrackingLink,
+			TrackingNumber:  tracking[0].TrackingNumber,
+			TrackingCompany: "Other",
+		}
+		_, err := client.Order.UpdateFulfillment(ctx, id, fulfillment)
+
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
 	}
 
-	err = app.writeJSON(w, http.StatusOK, envelope{"tracking": tracking, "fulfillment": fulfillment}, nil)
+	err = app.writeJSON(w, http.StatusOK, envelope{"tracking": tracking, "fulfillment": fulfillment, "errors": err}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

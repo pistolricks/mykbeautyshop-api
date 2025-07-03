@@ -10,23 +10,23 @@ import (
 )
 
 type TrackingInfo struct {
-	packagePk                 int
-	productPk                 int
-	packageName               string
-	productName               string
-	isPackage                 bool
-	quantity                  int
-	cv                        float64
-	sp                        float64
-	price                     float64
-	formattedPrice            string
-	currencyCode              string
-	shipmentNumber            string
-	shipmentStatus            string
-	shippedDate               string
-	trackingNumber            string
-	trackingLink              string
-	videoOrderPackagingInfoPK string
+	PackagePk                 int
+	ProductPk                 int
+	PackageName               string
+	ProductName               string
+	IsPackage                 bool
+	Quantity                  int
+	Cv                        float64
+	Sp                        float64
+	Price                     float64
+	FormattedPrice            string
+	CurrencyCode              string
+	ShipmentNumber            string
+	ShipmentStatus            string
+	ShippedDate               string
+	TrackingNumber            string
+	TrackingLink              string
+	VideoOrderPackagingInfoPK string
 }
 
 func OrderUpdateTracking(orderId string, token string) ([]TrackingInfo, error) {
