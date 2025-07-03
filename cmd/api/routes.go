@@ -23,11 +23,11 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodGet, "/v1/process/orders", app.processOrders)
 	router.HandlerFunc(http.MethodPost, "/v1/process/order", app.processOrder)
 
-	router.HandlerFunc(http.MethodGet, "/v1/riman/login", app.RimanLoginHandler)
-
 	router.HandlerFunc(http.MethodGet, "/v1/riman/orders", app.shippingHandler)
 
 	router.HandlerFunc(http.MethodGet, "/v1/riman/tracking", app.trackingHandler)
+
+	router.HandlerFunc(http.MethodPost, "/v1/riman/login", app.createRimanTokenHandler)
 
 	/*
 		router.HandlerFunc(http.MethodPost, "/v1/users", app.registerUserHandler)

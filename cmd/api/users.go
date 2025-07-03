@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"github.com/pistolricks/kbeauty-api/internal/data"
+	"github.com/pistolricks/kbeauty-api/internal/riman"
 	"github.com/pistolricks/kbeauty-api/internal/validator"
 	"net/http"
 	"time"
@@ -11,6 +12,7 @@ import (
 func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Name     string `json:"name"`
+		UserName string `json:"userName"`
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
@@ -23,8 +25,9 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 
 	user := &data.User{
 		Name:      input.Name,
+		UserName:  input.UserName,
 		Email:     input.Email,
-		Activated: false,
+		Activated: true,
 	}
 
 	err = user.Password.Set(input.Password)
@@ -52,13 +55,24 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err = app.models.Permissions.AddForUser(user.ID, "movies:read")
+	err = app.models.Permissions.AddForUser(user.ID, "auth:read")
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
 
-	token, err := app.models.Tokens.New(user.ID, 3*24*time.Hour, data.ScopeActivation)
+	credentials := riman.Credentials{
+		UserName: user.UserName,
+		Password: input.Password,
+	}
+
+	res, err := riman.Login(credentials)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	token, err := app.models.Tokens.NewRid(user.ID, 3*24*time.Hour, data.ScopeActivation, res.Jwt)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return

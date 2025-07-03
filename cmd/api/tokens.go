@@ -3,13 +3,49 @@ package main
 import (
 	"errors"
 	"github.com/pistolricks/kbeauty-api/internal/data"
+	"github.com/pistolricks/kbeauty-api/internal/riman"
 	"github.com/pistolricks/kbeauty-api/internal/validator"
 	"net/http"
 	"time"
 )
 
+func (app *application) createRimanTokenHandler(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		UserName string `json:"userName"`
+		Password string `json:"password"`
+	}
+
+	err := app.readJSON(w, r, &input)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	credentials := riman.Credentials{
+		UserName: input.UserName,
+		Password: input.Password,
+	}
+
+	v := validator.New()
+	data.ValidatePasswordPlaintext(v, credentials.Password)
+
+	if !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	post, err := riman.Login(credentials)
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"auth": post}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+
+}
+
 func (app *application) createAuthenticationTokenHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
+		UserName string `json:"userName"`
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
@@ -52,13 +88,24 @@ func (app *application) createAuthenticationTokenHandler(w http.ResponseWriter, 
 		return
 	}
 
-	token, err := app.models.Tokens.New(user.ID, 24*time.Hour, data.ScopeAuthentication)
+	credentials := riman.Credentials{
+		UserName: user.UserName,
+		Password: input.Password,
+	}
+
+	res, err := riman.Login(credentials)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
 
-	err = app.writeJSON(w, http.StatusCreated, envelope{"authentication_token": token}, nil)
+	token, err := app.models.Tokens.NewRid(user.ID, 24*time.Hour, data.ScopeAuthentication, res.Jwt)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	err = app.writeJSON(w, http.StatusCreated, envelope{"authentication_token": token, "auth": res}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
