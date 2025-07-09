@@ -4,7 +4,7 @@ Using headless chromium to automate orders.
 
 # Riman API
 
-products - ## Products - API  https://cart-api.riman.com/api/v2/products?cartType=R&countryCode=US&culture=en-US&isCart=true&repSiteUrl=Werekbeauty
+products - ## Products - API  https://cart-api.riman.com/api/v2/products?cartType=R&countryCode=US&culture=en-US&isCart=true&repSiteUrl=WeKBeauty
 
 
 orders - https://cart-api.riman.com/api/v1/orders?mainSiteUrl=2043124962&getEnrollerOrders=&getCustomerOrders=&orderNumber=&shipmentNumber=&trackingNumber=&isRefunded=&paidStatus=true&orderType=&orderLevel=&weChatOrderNumber=&startDate=&endDate=&offset=0&limit=20&orderBy=-mainOrdersPK

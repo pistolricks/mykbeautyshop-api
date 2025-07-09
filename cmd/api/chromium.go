@@ -58,7 +58,7 @@ func (app *application) SubmitOrder(loginUrl string, username string, password s
 	count := len(order.LineItems)
 
 	for i, product := range order.LineItems {
-		productUrl := fmt.Sprintf("https://mall.riman.com/Werekbeauty/products/%s", product.SKU)
+		productUrl := fmt.Sprintf("https://mall.riman.com/WeKBeauty/products/%s", product.SKU)
 
 		page := browser.MustPage(productUrl)
 
