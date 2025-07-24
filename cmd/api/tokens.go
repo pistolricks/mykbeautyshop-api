@@ -3,20 +3,31 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/joho/godotenv"
 	"github.com/pistolricks/kbeauty-api/internal/data"
 	"github.com/pistolricks/kbeauty-api/internal/riman"
 	"github.com/pistolricks/kbeauty-api/internal/validator"
 	"net/http"
+	"os"
 	"time"
 )
 
 func (app *application) createRimanTokenHandler(w http.ResponseWriter, r *http.Request) {
-	var input struct {
-		UserName string `json:"userName"`
-		Password string `json:"password"`
+
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+		return
 	}
 
-	err := app.readJSON(w, r, &input)
+	var input struct {
+		RimanStoreName string `json:"rimanStoreName"`
+		UserName       string `json:"userName"`
+		Password       string `json:"password"`
+		LoginUrl       string `json:"loginUrl"`
+	}
+
+	err = app.readJSON(w, r, &input)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
 		return
@@ -34,6 +45,15 @@ func (app *application) createRimanTokenHandler(w http.ResponseWriter, r *http.R
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
+
+	app.envars.Username = credentials.UserName
+	app.envars.Password = credentials.Password
+	app.envars.LoginUrl = input.LoginUrl
+
+	err = os.Setenv("RIMAN_STORE_NAME", input.RimanStoreName)
+	err = os.Setenv("LOGIN_URL", input.LoginUrl)
+	err = os.Setenv("USERNAME", credentials.UserName)
+	err = os.Setenv("Password", credentials.Password)
 
 	post, err := riman.Login(credentials)
 

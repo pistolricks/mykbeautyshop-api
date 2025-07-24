@@ -27,20 +27,20 @@ func (app *application) RimanLogin(loginUrl string, username string, password st
 	return page, browser
 }
 
-func (app *application) ProcessOrders(loginUrl string, username string, password string, orders []goshopify.Order) {
+func (app *application) ProcessOrders(rimanStoreName string, loginUrl string, username string, password string, orders []goshopify.Order) {
 	orderCount := len(orders)
 
 	switch orderCount := orderCount; {
 	case orderCount == 1:
-		app.SubmitOrder(loginUrl, username, password, orders[0])
+		app.SubmitOrder(rimanStoreName, loginUrl, username, password, orders[0])
 	case orderCount > 1:
 		for _, order := range orders {
-			app.SubmitOrder(loginUrl, username, password, order)
+			app.SubmitOrder(rimanStoreName, loginUrl, username, password, order)
 		}
 	}
 }
 
-func (app *application) SubmitOrder(loginUrl string, username string, password string, order goshopify.Order) {
+func (app *application) SubmitOrder(rimanStoreName string, loginUrl string, username string, password string, order goshopify.Order) {
 
 	browser := rod.New().MustConnect().DefaultDevice(devices.LaptopWithHiDPIScreen)
 
@@ -58,7 +58,7 @@ func (app *application) SubmitOrder(loginUrl string, username string, password s
 	count := len(order.LineItems)
 
 	for i, product := range order.LineItems {
-		productUrl := fmt.Sprintf("https://mall.riman.com/WeKBeauty/products/%s", product.SKU)
+		productUrl := fmt.Sprintf("https://mall.riman.com/%s/products/%s", rimanStoreName, product.SKU)
 
 		page := browser.MustPage(productUrl)
 

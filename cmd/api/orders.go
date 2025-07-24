@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	goshopify "github.com/bold-commerce/go-shopify/v4"
+	"github.com/joho/godotenv"
 	"github.com/pistolricks/kbeauty-api/internal/data"
 	"net/http"
+	"os"
 )
 
 /* ORDER STATUS */
@@ -112,12 +114,17 @@ func (app *application) listOrdersByAllStatusValuesHandler(w http.ResponseWriter
 }
 
 func (app *application) processOrder(w http.ResponseWriter, r *http.Request) {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+		return
+	}
 
 	var input struct {
 		Orders []goshopify.Order `json:"orders"`
 	}
 
-	err := app.readJSON(w, r, &input)
+	err = app.readJSON(w, r, &input)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
 		return
@@ -127,8 +134,32 @@ func (app *application) processOrder(w http.ResponseWriter, r *http.Request) {
 
 	count := len(input.Orders)
 
+	rimanStoreName := os.Getenv("RIMAN_STORE_NAME")
+	if rimanStoreName == "" {
+		fmt.Println("missing riman store name")
+		return
+	}
+
+	loginUrl := os.Getenv("LOGIN_URL")
+	if loginUrl == "" {
+		fmt.Println("missing login url")
+		return
+	}
+
+	username := os.Getenv("USERNAME")
+	if username == "" {
+		fmt.Println("missing username")
+		return
+	}
+
+	password := os.Getenv("PASSWORD")
+	if password == "" {
+		fmt.Println("missing password")
+		return
+	}
+
 	app.background(func() {
-		app.ProcessOrders(app.envars.LoginUrl, app.envars.Username, app.envars.Password, orders)
+		app.ProcessOrders(rimanStoreName, loginUrl, username, password, orders)
 	})
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"orders": input.Orders, "count": count}, nil)
@@ -139,6 +170,11 @@ func (app *application) processOrder(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) processOrders(w http.ResponseWriter, r *http.Request) {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+		return
+	}
 
 	shopApp := goshopify.App{
 		ApiKey:      app.envars.ShopifyKey,
@@ -171,8 +207,32 @@ func (app *application) processOrders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	rimanStoreName := os.Getenv("RIMAN_STORE_NAME")
+	if rimanStoreName == "" {
+		fmt.Println("missing riman store name")
+		return
+	}
+
+	loginUrl := os.Getenv("LOGIN_URL")
+	if loginUrl == "" {
+		fmt.Println("missing login url")
+		return
+	}
+
+	username := os.Getenv("USERNAME")
+	if username == "" {
+		fmt.Println("missing username")
+		return
+	}
+
+	password := os.Getenv("PASSWORD")
+	if password == "" {
+		fmt.Println("missing password")
+		return
+	}
+
 	app.background(func() {
-		app.ProcessOrders(app.envars.LoginUrl, app.envars.Username, app.envars.Password, orders)
+		app.ProcessOrders(rimanStoreName, loginUrl, username, password, orders)
 	})
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"orders": orders, "count": count}, nil)
