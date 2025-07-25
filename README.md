@@ -2,6 +2,8 @@
 
 Using headless chromium to automate orders.
 
+## read_assigned_fulfillment_orders
+
 # Riman API
 
 products - ## Products - API  https://cart-api.riman.com/api/v2/products?cartType=R&countryCode=US&culture=en-US&isCart=true&repSiteUrl=WeKBeauty
