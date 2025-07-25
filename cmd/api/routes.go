@@ -16,6 +16,8 @@ import (
 )
 
 func (app *application) routes() http.Handler {
+	client := clientWithToken()
+
 	router := httprouter.New()
 
 	router.NotFound = http.HandlerFunc(app.notFoundResponse)
