@@ -2,21 +2,12 @@ package main
 
 import (
 	"expvar"
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/handler/extension"
-	"github.com/99designs/gqlgen/graphql/handler/lru"
-	"github.com/99designs/gqlgen/graphql/handler/transport"
-	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/pistolricks/kbeauty-api/graph"
-	"github.com/vektah/gqlparser/v2/ast"
-	"log"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 )
 
 func (app *application) routes() http.Handler {
-	client := clientWithToken()
 
 	router := httprouter.New()
 
@@ -42,6 +33,9 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodPost, "/v1/users/register", app.registerUserHandler)
 
 	router.HandlerFunc(http.MethodPost, "/v1/users/login", app.createAuthenticationTokenHandler)
+
+	router.HandlerFunc(http.MethodGet, "/v1/orders/all", app.listAllOrders)
+	router.HandlerFunc(http.MethodGet, "/v1/orders/list", app.listOrders)
 	/*
 
 		router.HandlerFunc(http.MethodPut, "/v1/users/activated", app.activateUserHandler)
@@ -51,24 +45,6 @@ func (app *application) routes() http.Handler {
 		router.HandlerFunc(http.MethodPost, "/v1/tokens/activation", app.createActivationTokenHandler)
 		router.HandlerFunc(http.MethodPost, "/v1/tokens/password-reset", app.createPasswordResetTokenHandler)
 	*/
-
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
-
-	srv.AddTransport(transport.Options{})
-	srv.AddTransport(transport.GET{})
-	srv.AddTransport(transport.POST{})
-
-	srv.SetQueryCache(lru.New[*ast.QueryDocument](1000))
-
-	srv.Use(extension.Introspection{})
-	srv.Use(extension.AutomaticPersistedQuery{
-		Cache: lru.New[string](100),
-	})
-
-	http.Handle("/v2/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/v2/query", srv)
-
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", "4000")
 
 	router.Handler(http.MethodGet, "/debug/vars", expvar.Handler())
 

@@ -6,6 +6,7 @@ import (
 	goshopify "github.com/bold-commerce/go-shopify/v4"
 	"github.com/joho/godotenv"
 	"github.com/pistolricks/kbeauty-api/internal/data"
+	"github.com/pistolricks/kbeauty-api/internal/shopify"
 	"net/http"
 	"os"
 )
@@ -297,4 +298,24 @@ func (app *application) listOrdersHandler(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
+}
+
+func (app *application) listAllOrders(w http.ResponseWriter, r *http.Request) {
+	collection, err := shopify.ListAllOrders()
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"orders": collection}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+
+}
+
+func (app *application) listOrders(w http.ResponseWriter, r *http.Request) {
+	collection, err := shopify.ListOrders()
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"orders": collection}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+
 }
