@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	goshopify "github.com/bold-commerce/go-shopify/v4"
-	"github.com/pistolricks/kbeauty-api/internal/shopify"
 	"net/http"
 )
 
@@ -40,14 +39,4 @@ func (app *application) listProductsHandler(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
-}
-
-func (app *application) listProductsTest(w http.ResponseWriter, r *http.Request) {
-	collection, err := shopify.ListAllProducts()
-
-	err = app.writeJSON(w, http.StatusOK, envelope{"products": collection}, nil)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-	}
-
 }

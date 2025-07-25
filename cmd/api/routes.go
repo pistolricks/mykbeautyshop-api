@@ -36,6 +36,9 @@ func (app *application) routes() http.Handler {
 
 	router.HandlerFunc(http.MethodGet, "/v1/orders/all", app.listAllOrders)
 	router.HandlerFunc(http.MethodGet, "/v1/orders/list", app.listOrders)
+
+	router.HandlerFunc(http.MethodGet, "/v1/clients", app.listClientsHandler)
+
 	/*
 
 		router.HandlerFunc(http.MethodPut, "/v1/users/activated", app.activateUserHandler)
