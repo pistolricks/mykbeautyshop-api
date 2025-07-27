@@ -160,7 +160,7 @@ func (app *application) createToken(w http.ResponseWriter, r *http.Request) {
 			ClientId:     credentials.ClientId,
 			ClientSecret: credentials.ClientSecret,
 		}).SetResult(&CredentialsResponse{}). // or SetResult(LoginResponse{}).
-		SetError(&CredentialsError{}). // or SetError(LoginError{}).
+		SetError(&CredentialsError{}).        // or SetError(LoginError{}).
 		Post("https://apis.usps.com/oauth2/v3/token")
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"resources": res}, nil)
@@ -189,7 +189,7 @@ func (app *application) refreshToken(w http.ResponseWriter, r *http.Request) {
 			ClientSecret: credentials.ClientSecret,
 			RefreshToken: credentials.RefreshToken,
 		}).SetResult(&RefreshResponse{}). // or SetResult(LoginResponse{}).
-		SetError(&CredentialsError{}). // or SetError(LoginError{}).
+		SetError(&CredentialsError{}).    // or SetError(LoginError{}).
 		Post("https://apis.usps.com/oauth2/v3/token")
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"resources": res}, nil)
@@ -225,7 +225,7 @@ func (app *application) authorizationExchange(w http.ResponseWriter, r *http.Req
 			Code:         credentials.Code,
 			RedirectUri:  credentials.RedirectUri,
 		}).SetResult(&AuthorizationExchangeResponse{}). // or SetResult(LoginResponse{}).
-		SetError(&CredentialsError{}). // or SetError(LoginError{}).
+		SetError(&CredentialsError{}).                  // or SetError(LoginError{}).
 		Post("https://apis.usps.com/oauth2/v3/token")
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"resources": res}, nil)
@@ -263,7 +263,7 @@ func (app *application) createAuthorizationCode(w http.ResponseWriter, r *http.R
 			Scope:        credentials.Scope,
 			State:        credentials.State,
 		}).SetResult(&AuthorizationCodeResponse{}). // or SetResult(LoginResponse{}).
-		SetError(&CredentialsError{}). // or SetError(LoginError{}).
+		SetError(&CredentialsError{}).              // or SetError(LoginError{}).
 		Post("https://apis.usps.com/oauth2/v3/authorize")
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"resources": res}, nil)
@@ -293,7 +293,7 @@ func (app *application) revokeToken(w http.ResponseWriter, r *http.Request) {
 			Token:         credentials.Token,
 			TokenTypeHint: credentials.TokenTypeHint,
 		}).SetResult(&RevokeResponse{}). // or SetResult(LoginResponse{}).
-		SetError(&CredentialsError{}). // or SetError(LoginError{}).
+		SetError(&CredentialsError{}).   // or SetError(LoginError{}).
 		Post("https://apis.usps.com/oauth2/v3/revoke")
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"resources": res}, nil)
