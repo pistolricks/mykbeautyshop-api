@@ -4,7 +4,7 @@ import (
 	"resty.dev/v3"
 )
 
-type CartObject struct {
+type Cart struct {
 	CartKey                   string      `json:"cartKey"`
 	CartType                  string      `json:"cartType"`
 	CountryCode               string      `json:"countryCode"`
@@ -164,7 +164,7 @@ type CartErrors struct {
 	Error string `json:"error"`
 }
 
-func GetCartObject(token string, cartKey string) (*CartObject, error) {
+func GetCart(token string, cartKey string) (*Cart, error) {
 
 	client := resty.New()
 	defer client.Close()
@@ -173,12 +173,12 @@ func GetCartObject(token string, cartKey string) (*CartObject, error) {
 		SetPathParam("cartKey", cartKey).
 		SetHeader("Accept", "application/json").
 		SetAuthToken(token).
-		SetResult(&CartObject{}).
+		SetResult(&Cart{}).
 		SetError(&CartErrors{}).
 		Get("https://cart-api.riman.com/api/v1/shopping/{cartKey}")
 
 	if err != nil {
 		return nil, err
 	}
-	return res.Result().(*CartObject), err
+	return res.Result().(*Cart), err
 }
