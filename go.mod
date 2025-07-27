@@ -39,4 +39,5 @@ require (
 	golang.org/x/sys v0.33.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/guregu/null.v4 v4.0.0 // indirect
+	resty.dev/v3 v3.0.0-beta.3 // indirect
 )
