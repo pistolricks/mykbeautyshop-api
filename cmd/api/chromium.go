@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/go-rod/rod/lib/devices"
+	"os"
 	"strconv"
 	"strings"
 
@@ -188,7 +189,8 @@ func insertShippingInfo(page *rod.Page, checkoutUrl string, order goshopify.Orde
 	page.MustElement("#postalCode0").MustSelectAllText().MustInput(zip)
 
 	page.MustElement("#phoneNumber0").MustSelectAllText().MustInput(phone)
-	page.MustElement("#email0").MustSelectAllText().MustInput("embreday9@gmail.com")
+	email := os.Getenv("ACCOUNT_EMAIL")
+	page.MustElement("#email0").MustSelectAllText().MustInput(email)
 
 	/* Need to add Province/State */
 	// page.MustElement("#state0").MustSelectAllText().MustInput(province)

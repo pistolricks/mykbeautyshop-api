@@ -24,6 +24,8 @@ go.work.sum
 
 # env file
 .env
-.env.mykbeautyshop
-.env.wearekbeauty
 
+
+!/.env.mykbeautyshop
+
+!/.env.wearekbeauty
