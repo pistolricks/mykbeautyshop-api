@@ -1,13 +1,26 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	goshopify "github.com/bold-commerce/go-shopify/v4"
+	"github.com/pistolricks/kbeauty-api/internal/riman"
+	"github.com/pistolricks/kbeauty-api/internal/shopify"
 	"net/http"
 )
 
-func (app *application) listProductsHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) RimanApiListProductsHandler(w http.ResponseWriter, r *http.Request) {
+	// create a Resty client
+
+	products, err := riman.GetProducts()
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"products": products, "errors": err}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+
+}
+
+func (app *application) ShopifyApiListProductsHandler(w http.ResponseWriter, r *http.Request) {
 
 	shopApp := goshopify.App{
 		ApiKey:      app.envars.ShopifyKey,
@@ -18,24 +31,14 @@ func (app *application) listProductsHandler(w http.ResponseWriter, r *http.Reque
 
 	client, err := goshopify.NewClient(shopApp, app.envars.StoreName, app.envars.ShopifyToken)
 
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	count, err := client.Product.Count(context.Background(), nil)
+	products, count, err := shopify.GetProducts(client)
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	products, err := client.Product.List(context.Background(), nil)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	err = app.writeJSON(w, http.StatusOK, envelope{"products": products, "count": count}, nil)
+	err = app.writeJSON(w, http.StatusOK, envelope{"products": products, "count": count, "errors": err}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

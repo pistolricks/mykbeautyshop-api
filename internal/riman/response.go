@@ -83,3 +83,83 @@ type ShippedProductResponse struct {
 	TrackingLink              string      `json:"trackingLink"`
 	VideoOrderPackagingInfoPK interface{} `json:"videoOrderPackagingInfoPK"`
 }
+
+type RimanProduct struct {
+	ProductPK         int         `json:"productPK"`
+	ProductCode       string      `json:"productCode"`
+	Sku               interface{} `json:"sku"`
+	ProductCategory   string      `json:"productCategory"`
+	BrandId           int         `json:"brandId"`
+	BrandName         string      `json:"brandName"`
+	ProductBrand      interface{} `json:"productBrand"`
+	Name              string      `json:"name"`
+	ImageUrl          string      `json:"imageUrl"`
+	Weight            int         `json:"weight"`
+	IsComingSoon      bool        `json:"isComingSoon"`
+	ComingSoonMessage interface{} `json:"comingSoonMessage"`
+	IsPackage         bool        `json:"isPackage"`
+	PackageItems      []struct {
+		ProductPK   int    `json:"productPK"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		ImgUrl      string `json:"imgUrl"`
+		Qty         int    `json:"qty"`
+	} `json:"packageItems"`
+	IsConfigurable               bool          `json:"isConfigurable"`
+	IsProductAvailableOnAutoship bool          `json:"isProductAvailableOnAutoship"`
+	IsProductOnAutoship          bool          `json:"isProductOnAutoship"`
+	AutoshipProductPk            int           `json:"autoshipProductPk"`
+	MaxLimit                     int           `json:"maxLimit"`
+	Points                       float64       `json:"points"`
+	Bv                           int           `json:"bv"`
+	Sp                           int           `json:"sp"`
+	ProductMenuId                int           `json:"productMenuId"`
+	ProductMenu                  string        `json:"productMenu"`
+	Configurations               []interface{} `json:"configurations"`
+	Pricing                      []struct {
+		PriceType      string `json:"priceType"`
+		CurrencySymbol string `json:"currencySymbol"`
+		Price          int    `json:"price"`
+		NoVatPrice     int    `json:"noVatPrice"`
+		FormattedPrice string `json:"formattedPrice"`
+		PriceWarning   string `json:"priceWarning"`
+	} `json:"pricing"`
+	Description string `json:"description"`
+	ImageUrls   []struct {
+		ImageUrl  string `json:"imageUrl"`
+		ImageName string `json:"imageName"`
+	} `json:"imageUrls"`
+	AdditionalInfo              []interface{} `json:"additionalInfo"`
+	Documents                   []interface{} `json:"documents"`
+	IsShippable                 bool          `json:"isShippable"`
+	IsStarterKit                bool          `json:"isStarterKit"`
+	SeqNo                       int           `json:"seqNo"`
+	IsFoodProduct               bool          `json:"isFoodProduct"`
+	RankInfo                    interface{}   `json:"rankInfo"`
+	IsRetailPackage             bool          `json:"isRetailPackage"`
+	IsVolumeBasedRSB            bool          `json:"isVolumeBasedRSB"`
+	MainType                    int           `json:"mainType"`
+	ActiveSmartDelivery         bool          `json:"activeSmartDelivery"`
+	IsRedemption                bool          `json:"isRedemption"`
+	PriceType                   string        `json:"priceType"`
+	DoNotSplitPackBV            bool          `json:"doNotSplitPackBV"`
+	SdOnlyPackage               bool          `json:"sdOnlyPackage"`
+	ShowSDCheckbox              bool          `json:"showSDCheckbox"`
+	OfferAffiliateProgram       bool          `json:"offerAffiliateProgram"`
+	OfferPreferredCust          bool          `json:"offerPreferredCust"`
+	OfferLoyaltyProgram         bool          `json:"offerLoyaltyProgram"`
+	OfferSDOnShop               bool          `json:"offerSDOnShop"`
+	IsRetailCart                bool          `json:"isRetailCart"`
+	ProductLineId               int           `json:"productLineId"`
+	ProductLine                 string        `json:"productLine"`
+	ProductFunction             string        `json:"productFunction"`
+	MaxLifetimeLimitCatCode     interface{}   `json:"maxLifetimeLimitCatCode"`
+	MaxLifetimeLimit            interface{}   `json:"maxLifetimeLimit"`
+	JoinMaxLifetimeLimitCatCode string        `json:"joinMaxLifetimeLimitCatCode"`
+	JoinMaxLifetimeLimit        int           `json:"joinMaxLifetimeLimit"`
+	ProductCmsData              []struct {
+		Name    string `json:"name"`
+		Value   string `json:"value"`
+		DataTag string `json:"dataTag"`
+	} `json:"productCmsData"`
+}

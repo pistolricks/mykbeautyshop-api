@@ -16,7 +16,8 @@ func (app *application) routes() http.Handler {
 
 	router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.healthcheckHandler)
 
-	router.HandlerFunc(http.MethodGet, "/v1/products", app.listProductsHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/riman/products", app.RimanApiListProductsHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/shopify/products", app.ShopifyApiListProductsHandler)
 	router.HandlerFunc(http.MethodGet, "/v1/orders", app.listOrdersHandler)
 
 	router.HandlerFunc(http.MethodPost, "/v1/attributes/metafield", app.updateOrderMetaField)
