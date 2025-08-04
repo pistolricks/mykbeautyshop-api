@@ -6,6 +6,8 @@ Using headless chromium to automate orders.
 
 # Riman API
 
+
+not logged in products - https://cart-api.riman.com/api/v2/products?cartType=R&countryCode=US&culture=en-US&isCart=true&repSiteUrl=rmnsocial
 products - ## Products - API  https://cart-api.riman.com/api/v2/products?cartType=R&countryCode=US&culture=en-US&isCart=true&repSiteUrl=WeKBeauty
 
 

@@ -36,9 +36,9 @@ func OrderCreate(order Order) (*OrderResponse, error) {
 			CountryCode:     order.CountryCode,
 			SalesCampaignFK: order.SalesCampaignFK,
 			CartKey:         order.CartKey,
-		}). // default request content type is JSON
+		}).                          // default request content type is JSON
 		SetResult(&OrderResponse{}). // or SetResult(LoginResponse{}).
-		SetError(&Errors{}). // or SetError(LoginError{}).
+		SetError(&Errors{}).         // or SetError(LoginError{}).
 		Post("https://cart-api.riman.com/api/v2/order")
 
 	if err != nil {
