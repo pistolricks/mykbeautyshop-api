@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 )
@@ -44,6 +45,63 @@ type Client struct {
 
 type ClientModel struct {
 	DB *sql.DB
+}
+
+func (m UserModel) GetByUsername(username string) (*Client, error) {
+	query := `
+        SELECT id, created_at, first_name, middle_name, last_name, suffix, email, mobile, username, riman_user_id, status, organization_type, signup_date, anniversary_date, account_type, sponsor_username, member_id, rank, enrollment_date, personal_orders_volume, personal_clients_volume, total_personal_volume, current_month_sp, current_month_bp, last_order_date, last_order_id, last_order_sp, last_order_bp, lifetime_spend, most_recent_12_month_spend, data
+        FROM clients
+        WHERE username = $1`
+
+	var client Client
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	err := m.DB.QueryRowContext(ctx, query, username).Scan(
+		&client.ID,
+		&client.CreatedAt,
+		&client.FirstName,
+		&client.MiddleName,
+		&client.LastName,
+		&client.Suffix,
+		&client.Email,
+		&client.Mobile,
+		&client.Username,
+		&client.RimanUserId,
+		&client.Status,
+		&client.OrganizationType,
+		&client.SignupDate,
+		&client.AnniversaryDate,
+		&client.AccountType,
+		&client.SponsorUsername,
+		&client.MemberId,
+		&client.Rank,
+		&client.EnrollmentDate,
+		&client.PersonalOrdersVolume,
+		&client.PersonalClientsVolume,
+		&client.TotalPersonalVolume,
+		&client.CurrentMonthSp,
+		&client.CurrentMonthBp,
+		&client.LastOrderDate,
+		&client.LastOrderId,
+		&client.LastOrderSp,
+		&client.LastOrderBp,
+		&client.LifetimeSpend,
+		&client.MostRecent12MonthSpend,
+		&client.Data,
+	)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrRecordNotFound
+		default:
+			return nil, err
+		}
+	}
+
+	return &client, nil
 }
 
 func (m ClientModel) GetAll() ([]*Client, Metadata, error) {
