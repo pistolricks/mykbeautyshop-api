@@ -2,24 +2,45 @@ package main
 
 import (
 	"fmt"
+	"github.com/go-rod/rod/lib/proto"
 	"github.com/pistolricks/kbeauty-api/internal/data"
 	"github.com/pistolricks/kbeauty-api/internal/riman"
 	"github.com/pistolricks/kbeauty-api/internal/validator"
 	"net/http"
 	"os"
+	"slices"
 )
 
 func (app *application) homePageHandler(w http.ResponseWriter, r *http.Request) {
 
 	rimanStoreName := os.Getenv("RIMAN_STORE_NAME")
+	rimanRid := os.Getenv("USERNAME")
+	rimanUrl := os.Getenv("LOGIN_URL")
 	currentBrowser := app.browser
 	currentCookies := app.cookies
+
+	idx := slices.IndexFunc(currentCookies, func(c *proto.NetworkCookie) bool { return c.Name == "token" })
+
+	var foundCookie proto.NetworkCookie
+
+	if idx != -1 {
+		foundCookie := currentCookies[idx]
+		fmt.Printf("Found client: %v\n", foundCookie)
+		// Output: Found client: {ID:2 Name:Jane Smith}
+	} else {
+		fmt.Println("Client not found")
+	}
+
+	app.envars.RimanStoreName = rimanStoreName
+	app.envars.LoginUrl = rimanUrl
+	app.envars.Username = rimanRid
+	app.envars.Token = foundCookie.Value
 
 	page, browser, cookies, _ := app.HomePage(rimanStoreName, currentBrowser, currentCookies)
 
 	fmt.Println(cookies)
 
-	err := app.writeJSON(w, http.StatusOK, envelope{"page": page, "browser": browser, "cookies": cookies}, nil)
+	err := app.writeJSON(w, http.StatusOK, envelope{"page": page, "browser": browser, "cookies": cookies, "rid": rimanRid, "store": rimanStoreName, "url": rimanUrl}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
@@ -54,6 +75,7 @@ func (app *application) clientLoginHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	app.envars.RimanStoreName = input.RimanStoreName
 	app.envars.Username = credentials.UserName
 	app.envars.Password = credentials.Password
 	app.envars.LoginUrl = input.LoginUrl

@@ -42,6 +42,7 @@ func (app *application) createRimanTokenHandler(w http.ResponseWriter, r *http.R
 	app.envars.Username = credentials.UserName
 	app.envars.Password = credentials.Password
 	app.envars.LoginUrl = input.LoginUrl
+	app.envars.RimanStoreName = input.RimanStoreName
 
 	err = os.Setenv("RIMAN_STORE_NAME", input.RimanStoreName)
 	err = os.Setenv("LOGIN_URL", input.LoginUrl)
@@ -50,7 +51,7 @@ func (app *application) createRimanTokenHandler(w http.ResponseWriter, r *http.R
 
 	post, err := riman.Login(credentials)
 
-	err = app.writeJSON(w, http.StatusOK, envelope{"auth": post}, nil)
+	err = app.writeJSON(w, http.StatusOK, envelope{"auth": post, "rid": app.envars.Username, "store": app.envars.RimanStoreName, "url": app.envars.LoginUrl}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

@@ -21,14 +21,15 @@ import (
 )
 
 type Envars struct {
-	StoreName     string
-	LoginUrl      string
-	Username      string
-	Password      string
-	ShopifyToken  string
-	ShopifyKey    string
-	ShopifySecret string
-	Token         string
+	StoreName      string
+	RimanStoreName string
+	LoginUrl       string
+	Username       string
+	Password       string
+	ShopifyToken   string
+	ShopifyKey     string
+	ShopifySecret  string
+	Token          string
 }
 
 var (
@@ -83,6 +84,12 @@ func main() {
 	storeName := os.Getenv("STORE_NAME")
 	if storeName == "" {
 		fmt.Println("missing store name")
+		return
+	}
+
+	rimanStoreName := os.Getenv("RIMAN_STORE_NAME")
+	if rimanStoreName == "" {
+		fmt.Println("missing riman store name")
 		return
 	}
 
@@ -188,7 +195,7 @@ func main() {
 		return time.Now().Unix()
 	}))
 
-	vars := &Envars{StoreName: storeName, LoginUrl: loginUrl, Username: username, Password: password, ShopifyToken: shopifyToken, ShopifyKey: shopifyKey, ShopifySecret: shopifySecret, Token: token}
+	vars := &Envars{StoreName: storeName, RimanStoreName: rimanStoreName, LoginUrl: loginUrl, Username: username, Password: password, ShopifyToken: shopifyToken, ShopifyKey: shopifyKey, ShopifySecret: shopifySecret, Token: token}
 
 	fmt.Println(vars)
 
