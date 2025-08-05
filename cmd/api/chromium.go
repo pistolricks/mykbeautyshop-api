@@ -43,6 +43,8 @@ func (app *application) RimanLogin(loginUrl string, rimanStoreName string, usern
 	// --allow-third-party-cookies
 	path, _ := launcher.LookPath()
 
+	// homeUrl := fmt.Sprintf("https://mall.riman.com/%s/home", rimanStoreName)
+
 	u := launcher.New().
 		Headless(false).
 		Devtools(true).
@@ -107,7 +109,7 @@ func (app *application) SubmitOrder(rimanStoreName string, browser *rod.Browser,
 				return
 			}
 
-			app.processShipping(page, cookies, order)
+			app.processShipping(browser, page, cookies, order)
 
 		}
 
@@ -134,7 +136,7 @@ func networkCookies(cookies []*proto.NetworkCookie) []*proto.NetworkCookieParam 
 	return networkCookie
 }
 
-func (app *application) processShipping(page *rod.Page, cookies []*proto.NetworkCookie, order goshopify.Order) {
+func (app *application) processShipping(browser *rod.Browser, page *rod.Page, cookies []*proto.NetworkCookie, order goshopify.Order) {
 
 	app.background(func() {
 
@@ -150,7 +152,7 @@ func (app *application) processShipping(page *rod.Page, cookies []*proto.Network
 
 				checkoutUrl := fmt.Sprintf("https://mall.riman.com/checkout/shipping?cartKey=%s", cartValue)
 
-				insertShippingInfo(page, checkoutUrl, order)
+				app.insertShippingInfo(browser, page, checkoutUrl, order)
 
 			default:
 				fmt.Println("not right cookie")
@@ -169,10 +171,27 @@ type StateObject = struct {
 
 /* TODO: REMOVE HARD CODED EMAIL */
 
-func insertShippingInfo(page *rod.Page, checkoutUrl string, order goshopify.Order) {
-	wait := page.MustWaitNavigation()
-	page.MustNavigate(checkoutUrl)
+func (app *application) insertShippingInfo(browser *rod.Browser, page *rod.Page, checkoutUrl string, order goshopify.Order) {
+
+	p := browser.MustPage(checkoutUrl)
+
+	newCookies, err := browser.GetCookies()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	networkCookie := networkCookies(newCookies)
+
+	p.MustSetCookies(networkCookie...)
+
+	wait := p.MustWaitNavigation()
+	p.MustNavigate(checkoutUrl)
 	wait()
+
+	app.page = p
+	app.browser = browser
+	app.cookies = newCookies
 
 	shippingAddress := order.ShippingAddress
 
@@ -191,8 +210,8 @@ func insertShippingInfo(page *rod.Page, checkoutUrl string, order goshopify.Orde
 	phone := strings.Replace(strings.TrimSpace(shippingAddress.Phone), "+1", "", 1)
 	// email := strings.TrimSpace(order.Email)
 
-	page.MustElement("#firstName0").MustSelectAllText().MustInput(firstName)
-	page.MustElement("#lastName0").MustSelectAllText().MustInput(lastName)
+	p.MustElement("#firstName0").MustSelectAllText().MustInput(firstName)
+	p.MustElement("#lastName0").MustSelectAllText().MustInput(lastName)
 
 	removedAddress2 := strings.Replace(address1, address2, "", 1)
 	removedCity := strings.Replace(removedAddress2, city, "", 1)
@@ -205,17 +224,17 @@ func insertShippingInfo(page *rod.Page, checkoutUrl string, order goshopify.Orde
 
 	address := fmt.Sprintf("%s %s, %s", formattedAddress, address2, shortZip)
 
-	page.MustElement("#address10").MustSelectAllText().MustInput(address)
-	page.MustElement("#address20").MustSelectAllText().MustInput(company)
+	p.MustElement("#address10").MustSelectAllText().MustInput(address)
+	p.MustElement("#address20").MustSelectAllText().MustInput(company)
 
-	page.MustElement("#city0").MustSelectAllText().MustInput(city)
-	// page.MustElement("#state0").MustSelect(provinceCode)
-	page.MustElement("#postalCode0").MustSelectAllText().MustInput(zip)
+	p.MustElement("#city0").MustSelectAllText().MustInput(city)
+	// p.MustElement("#state0").MustSelect(provinceCode)
+	p.MustElement("#postalCode0").MustSelectAllText().MustInput(zip)
 
-	page.MustElement("#phoneNumber0").MustSelectAllText().MustInput(phone)
+	p.MustElement("#phoneNumber0").MustSelectAllText().MustInput(phone)
 	email := os.Getenv("ACCOUNT_EMAIL")
-	page.MustElement("#email0").MustSelectAllText().MustInput(email)
+	p.MustElement("#email0").MustSelectAllText().MustInput(email)
 
 	/* Need to add Province/State */
-	// page.MustElement("#state0").MustSelectAllText().MustInput(province)
+	// p.MustElement("#state0").MustSelectAllText().MustInput(province)
 }

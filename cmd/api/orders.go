@@ -140,7 +140,11 @@ func (app *application) processOrder(w http.ResponseWriter, r *http.Request) {
 		app.ProcessOrders(rimanStoreName, app.browser, app.cookies, orders)
 	})
 
-	err = app.writeJSON(w, http.StatusOK, envelope{"orders": input.Orders, "count": count}, nil)
+	currentBrowser := app.browser
+	currentPage := app.page
+	currentCookies := app.cookies
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"orders": input.Orders, "count": count, "page": currentPage, "browser": currentBrowser, "cookies": currentCookies}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
