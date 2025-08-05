@@ -85,31 +85,29 @@ func GetOrders(token string, cookies []*proto.NetworkCookie) (*OrderResponse, er
 	mainSiteUrl := os.Getenv("USERNAME")
 	updatedCookies := restyCookies(cookies)
 
-	url := fmt.Sprintf("https://cart-api.riman.com/api/v1/orders?mainSiteUrl=%s&memberID=&getEnrollerOrders=&getCustomerOrders=&orderNumber=&shipmentNumber=&trackingNumber=&isRefunded=&paidStatus=true&orderType=&orderLevel=&weChatOrderNumber=&startDate=&endDate=&offset=0&limit=10&orderBy=-mainOrdersPK", mainSiteUrl)
+	url := fmt.Sprintf("https://cart-api.riman.com/api/v1/orders")
+	// url := fmt.Sprintf("https://cart-api.riman.com/api/v1/orders?mainSiteUrl=%s&memberID=&getEnrollerOrders=&getCustomerOrders=&orderNumber=&shipmentNumber=&trackingNumber=&isRefunded=&paidStatus=true&orderType=&orderLevel=&weChatOrderNumber=&startDate=&endDate=&offset=0&limit=10&orderBy=-mainOrdersPK", mainSiteUrl)
 	res, err := client.R().
 		SetAuthToken(token).
 		SetCookies(updatedCookies).
-		/*
-			SetQueryParams(map[string]string{
-				"mainSiteUrl": mainSiteUrl,
-				// "getEnrollerOrders": "",
-				// "getCustomerOrders": "",
-				// "orderNumber":       "",
-				// "shipmentNumber":    "",
-				// "trackingNumber":    "",
-				// "isRefunded":        "",
-				"paidStatus": "true",
-				// "orderType":         "",
-				// "orderLevel":        "",
-				// "weChatOrderNumber": "",
-				// "startDate":         "",
-				// "endDate":           "",
-				"offset":  "0",
-				"limit":   "20",
-				"orderBy": "-mainOrdersPK",
-			}).
-		*/
-		// SetHeader("Accept", "application/json").
+		SetQueryParams(map[string]string{
+			"mainSiteUrl":       mainSiteUrl,
+			"getEnrollerOrders": "",
+			"getCustomerOrders": "",
+			"orderNumber":       "",
+			"shipmentNumber":    "",
+			"trackingNumber":    "",
+			"isRefunded":        "",
+			"paidStatus":        "true",
+			"orderType":         "",
+			"orderLevel":        "",
+			"weChatOrderNumber": "",
+			"startDate":         "",
+			"endDate":           "",
+			"offset":            "0",
+			"limit":             "20",
+			"orderBy":           "-mainOrdersPK",
+		}).
 		SetResult(&OrderResponse{}).
 		SetError(&Errors{}).
 		Get(url)
