@@ -105,7 +105,7 @@ func GetOrders(token string, cookies []*proto.NetworkCookie) (*OrderResponse, er
 			"startDate":         "",
 			"endDate":           "",
 			"offset":            "0",
-			"limit":             "20",
+			"limit":             "50",
 			"orderBy":           "-mainOrdersPK",
 		}).
 		SetResult(&OrderResponse{}).
