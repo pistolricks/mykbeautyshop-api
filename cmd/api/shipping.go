@@ -4,6 +4,7 @@ import (
 	"fmt"
 	goshopify "github.com/bold-commerce/go-shopify/v4"
 	"github.com/pistolricks/kbeauty-api/internal/data"
+	"github.com/pistolricks/kbeauty-api/internal/riman"
 	"io"
 	"net/http"
 	"net/url"
@@ -73,6 +74,28 @@ type RimanOrder struct {
 	ShowOrderInvoice        bool        `json:"showOrderInvoice"`
 	KrGuaranteeNo           string      `json:"krGuaranteeNo"`
 	WeChatOrderNumber       interface{} `json:"weChatOrderNumber"`
+}
+
+func (app *application) getShipmentHandler(w http.ResponseWriter, r *http.Request) {
+
+	var input struct {
+		OrderId string `json:"order_id"`
+	}
+
+	err := app.readJSON(w, r, &input)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	orderId := input.OrderId
+
+	shipment, err := riman.ShipmentHandler(orderId)
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"shipment": shipment, "errors": err}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
 }
 
 func (app *application) trackingHandler(w http.ResponseWriter, r *http.Request) {

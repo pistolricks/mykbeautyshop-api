@@ -6,6 +6,7 @@ import (
 	goshopify "github.com/bold-commerce/go-shopify/v4"
 	"github.com/joho/godotenv"
 	"github.com/pistolricks/kbeauty-api/internal/data"
+	"github.com/pistolricks/kbeauty-api/internal/riman"
 	"github.com/pistolricks/kbeauty-api/internal/shopify"
 	"net/http"
 	"os"
@@ -36,7 +37,7 @@ import (
 // any
 // unpaid
 
-func (app *application) listOrdersByStatusHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) listShopifyOrdersByStatusHandler(w http.ResponseWriter, r *http.Request) {
 	shopApp := goshopify.App{
 		ApiKey:      app.envars.ShopifyKey,
 		ApiSecret:   app.envars.ShopifySecret,
@@ -72,7 +73,7 @@ func (app *application) listOrdersByStatusHandler(w http.ResponseWriter, r *http
 	}
 }
 
-func (app *application) listOrdersByAllStatusValuesHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) listShopifyOrdersByAllStatusValuesHandler(w http.ResponseWriter, r *http.Request) {
 
 	shopApp := goshopify.App{
 		ApiKey:      app.envars.ShopifyKey,
@@ -114,7 +115,7 @@ func (app *application) listOrdersByAllStatusValuesHandler(w http.ResponseWriter
 	}
 }
 
-func (app *application) processOrder(w http.ResponseWriter, r *http.Request) {
+func (app *application) processShopifyOrder(w http.ResponseWriter, r *http.Request) {
 
 	var input struct {
 		Orders []goshopify.Order `json:"orders"`
@@ -151,7 +152,7 @@ func (app *application) processOrder(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (app *application) processOrders(w http.ResponseWriter, r *http.Request) {
+func (app *application) processShopifyOrders(w http.ResponseWriter, r *http.Request) {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("Error loading .env file")
@@ -224,7 +225,7 @@ func (app *application) processOrders(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (app *application) listOrdersHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) listShopifyOrdersHandler(w http.ResponseWriter, r *http.Request) {
 
 	shopApp := goshopify.App{
 		ApiKey:      app.envars.ShopifyKey,
@@ -281,7 +282,7 @@ func (app *application) listOrdersHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func (app *application) listAllOrders(w http.ResponseWriter, r *http.Request) {
+func (app *application) listAllShopifyOrders(w http.ResponseWriter, r *http.Request) {
 	collection, err := shopify.ListAllOrders()
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"orders": collection}, nil)
@@ -291,10 +292,27 @@ func (app *application) listAllOrders(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (app *application) listOrders(w http.ResponseWriter, r *http.Request) {
+func (app *application) listShopifyOrders(w http.ResponseWriter, r *http.Request) {
 	collection, err := shopify.ListOrders()
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"orders": collection}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+
+}
+
+func (app *application) listRimanOrders(w http.ResponseWriter, r *http.Request) {
+
+	orderResponse, err := riman.GetOrders(app.envars.Token, app.cookies)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+
+	orders := orderResponse.Orders
+	count := orderResponse.TotalCount
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"orders": orders, "count": count}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

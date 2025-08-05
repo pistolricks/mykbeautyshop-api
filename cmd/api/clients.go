@@ -2,14 +2,25 @@ package main
 
 import (
 	"fmt"
-	"github.com/go-rod/rod/lib/proto"
 	"github.com/pistolricks/kbeauty-api/internal/data"
 	"github.com/pistolricks/kbeauty-api/internal/riman"
 	"github.com/pistolricks/kbeauty-api/internal/validator"
 	"net/http"
 	"os"
-	"slices"
 )
+
+func (app *application) findCookieValue() *string {
+	for i := range app.cookies {
+		if app.cookies[i].Name == "token" {
+			app.envars.Token = app.cookies[i].Value
+			fmt.Println("app.envars.Token")
+			fmt.Println(app.envars.Token)
+			return &app.cookies[i].Value
+		}
+	}
+	// Return nil if no product is found
+	return nil
+}
 
 func (app *application) homePageHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -19,26 +30,17 @@ func (app *application) homePageHandler(w http.ResponseWriter, r *http.Request) 
 	currentBrowser := app.browser
 	currentCookies := app.cookies
 
-	idx := slices.IndexFunc(currentCookies, func(c *proto.NetworkCookie) bool { return c.Name == "token" })
-
-	var foundCookie proto.NetworkCookie
-
-	if idx != -1 {
-		foundCookie := currentCookies[idx]
-		fmt.Printf("Found client: %v\n", foundCookie)
-		// Output: Found client: {ID:2 Name:Jane Smith}
-	} else {
-		fmt.Println("Client not found")
-	}
-
 	app.envars.RimanStoreName = rimanStoreName
 	app.envars.LoginUrl = rimanUrl
 	app.envars.Username = rimanRid
-	app.envars.Token = foundCookie.Value
 
 	page, browser, cookies, _ := app.HomePage(rimanStoreName, currentBrowser, currentCookies)
 
 	fmt.Println(cookies)
+
+	token := app.findCookieValue()
+	fmt.Println("TOKEN")
+	fmt.Println(token)
 
 	err := app.writeJSON(w, http.StatusOK, envelope{"page": page, "browser": browser, "cookies": cookies, "rid": rimanRid, "store": rimanStoreName, "url": rimanUrl}, nil)
 	if err != nil {

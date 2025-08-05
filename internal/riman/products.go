@@ -7,6 +7,8 @@ import (
 
 type Products struct{}
 
+/**/
+
 func GetProducts() (*[]RimanProduct, error) {
 
 	client := resty.New()

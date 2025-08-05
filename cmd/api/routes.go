@@ -18,15 +18,15 @@ func (app *application) routes() http.Handler {
 
 	router.HandlerFunc(http.MethodGet, "/v1/riman/products", app.RimanApiListProductsHandler)
 	router.HandlerFunc(http.MethodGet, "/v1/shopify/products", app.ShopifyApiListProductsHandler)
-	router.HandlerFunc(http.MethodGet, "/v1/orders", app.listOrdersHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/orders", app.listShopifyOrdersHandler)
 
 	router.HandlerFunc(http.MethodPost, "/v1/attributes/metafield", app.updateOrderMetaField)
 
-	router.HandlerFunc(http.MethodGet, "/v1/process/orders", app.processOrders)
-	router.HandlerFunc(http.MethodPost, "/v1/process/order", app.processOrder)
+	router.HandlerFunc(http.MethodGet, "/v1/process/orders", app.processShopifyOrders)
+	router.HandlerFunc(http.MethodPost, "/v1/process/order", app.processShopifyOrder)
 
-	router.HandlerFunc(http.MethodGet, "/v1/riman/orders", app.shippingHandler)
-
+	router.HandlerFunc(http.MethodGet, "/v1/riman/orders", app.listRimanOrders)
+	router.HandlerFunc(http.MethodGet, "/v1/riman/shipment", app.getShipmentHandler)
 	router.HandlerFunc(http.MethodGet, "/v1/riman/tracking", app.trackingHandler)
 
 	router.HandlerFunc(http.MethodPost, "/v1/riman/login", app.clientLoginHandler)
@@ -37,8 +37,8 @@ func (app *application) routes() http.Handler {
 
 	router.HandlerFunc(http.MethodPost, "/v1/users/login", app.createAuthenticationTokenHandler)
 
-	router.HandlerFunc(http.MethodGet, "/v1/orders/all", app.listAllOrders)
-	router.HandlerFunc(http.MethodGet, "/v1/orders/list", app.listOrders)
+	router.HandlerFunc(http.MethodGet, "/v1/orders/all", app.listAllShopifyOrders)
+	router.HandlerFunc(http.MethodGet, "/v1/orders/list", app.listShopifyOrders)
 
 	router.HandlerFunc(http.MethodGet, "/v1/clients", app.listClientsHandler)
 

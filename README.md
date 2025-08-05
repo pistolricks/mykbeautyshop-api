@@ -11,6 +11,8 @@ not logged in products - https://cart-api.riman.com/api/v2/products?cartType=R&c
 products - ## Products - API  https://cart-api.riman.com/api/v2/products?cartType=R&countryCode=US&culture=en-US&isCart=true&repSiteUrl=WeKBeauty
 
 
+shipping - https://cart-api.riman.com/api/v1/orders/1276604/shipment-products
+
 orders - https://cart-api.riman.com/api/v1/orders?mainSiteUrl=2043124962&getEnrollerOrders=&getCustomerOrders=&orderNumber=&shipmentNumber=&trackingNumber=&isRefunded=&paidStatus=true&orderType=&orderLevel=&weChatOrderNumber=&startDate=&endDate=&offset=0&limit=20&orderBy=-mainOrdersPK
 
 shipping - https://cart-api.riman.com/api/v1/orders/{OrderNumber}/shipment-products
