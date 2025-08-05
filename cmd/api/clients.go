@@ -9,6 +9,23 @@ import (
 	"os"
 )
 
+func (app *application) homePageHandler(w http.ResponseWriter, r *http.Request) {
+
+	rimanStoreName := os.Getenv("RIMAN_STORE_NAME")
+	currentBrowser := app.browser
+	currentCookies := app.cookies
+
+	page, browser, cookies, _ := app.HomePage(rimanStoreName, currentBrowser, currentCookies)
+
+	fmt.Println(cookies)
+
+	err := app.writeJSON(w, http.StatusOK, envelope{"page": page, "browser": browser, "cookies": cookies}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+
+}
+
 func (app *application) clientLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	var input struct {

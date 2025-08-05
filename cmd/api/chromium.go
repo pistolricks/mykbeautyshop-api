@@ -12,6 +12,33 @@ import (
 	"strings"
 )
 
+func (app *application) HomePage(rimanStoreName string, browser *rod.Browser, cookies []*proto.NetworkCookie) (*rod.Page, *rod.Browser, []*proto.NetworkCookie, error) {
+	networkCookie := networkCookies(cookies)
+
+	homeUrl := fmt.Sprintf("https://mall.riman.com/%s/home", rimanStoreName)
+
+	page := browser.MustPage(homeUrl)
+
+	page.MustSetCookies(networkCookie...)
+
+	wait := page.MustWaitNavigation()
+	page.MustNavigate(homeUrl)
+	wait()
+
+	app.page = page
+	app.browser = browser
+
+	newCookies, err := browser.GetCookies()
+	if err != nil {
+		fmt.Println(err)
+		return page, browser, newCookies, err
+	}
+
+	app.cookies = newCookies
+
+	return page, browser, newCookies, err
+}
+
 func (app *application) RimanLogin(loginUrl string, rimanStoreName string, username string, password string) (*rod.Page, *rod.Browser, []*proto.NetworkCookie) {
 	// --allow-third-party-cookies
 	path, _ := launcher.LookPath()
