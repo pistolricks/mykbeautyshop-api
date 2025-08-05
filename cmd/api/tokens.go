@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/joho/godotenv"
 	"github.com/pistolricks/kbeauty-api/internal/data"
 	"github.com/pistolricks/kbeauty-api/internal/riman"
 	"github.com/pistolricks/kbeauty-api/internal/validator"
@@ -14,12 +13,6 @@ import (
 
 func (app *application) createRimanTokenHandler(w http.ResponseWriter, r *http.Request) {
 
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println("Error loading .env file")
-		return
-	}
-
 	var input struct {
 		RimanStoreName string `json:"rimanStoreName"`
 		UserName       string `json:"userName"`
@@ -27,7 +20,7 @@ func (app *application) createRimanTokenHandler(w http.ResponseWriter, r *http.R
 		LoginUrl       string `json:"loginUrl"`
 	}
 
-	err = app.readJSON(w, r, &input)
+	err := app.readJSON(w, r, &input)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
 		return

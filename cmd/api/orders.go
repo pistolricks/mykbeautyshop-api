@@ -115,17 +115,12 @@ func (app *application) listOrdersByAllStatusValuesHandler(w http.ResponseWriter
 }
 
 func (app *application) processOrder(w http.ResponseWriter, r *http.Request) {
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println("Error loading .env file")
-		return
-	}
 
 	var input struct {
 		Orders []goshopify.Order `json:"orders"`
 	}
 
-	err = app.readJSON(w, r, &input)
+	err := app.readJSON(w, r, &input)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
 		return
@@ -141,26 +136,8 @@ func (app *application) processOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	loginUrl := os.Getenv("LOGIN_URL")
-	if loginUrl == "" {
-		fmt.Println("missing login url")
-		return
-	}
-
-	username := os.Getenv("USERNAME")
-	if username == "" {
-		fmt.Println("missing username")
-		return
-	}
-
-	password := os.Getenv("PASSWORD")
-	if password == "" {
-		fmt.Println("missing password")
-		return
-	}
-
 	app.background(func() {
-		app.ProcessOrders(rimanStoreName, loginUrl, username, password, orders)
+		app.ProcessOrders(rimanStoreName, app.browser, app.cookies, orders)
 	})
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"orders": input.Orders, "count": count}, nil)
@@ -233,7 +210,7 @@ func (app *application) processOrders(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.background(func() {
-		app.ProcessOrders(rimanStoreName, loginUrl, username, password, orders)
+		app.ProcessOrders(rimanStoreName, app.browser, app.cookies, orders)
 	})
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"orders": orders, "count": count}, nil)

@@ -2,48 +2,28 @@ package main
 
 import (
 	"fmt"
+	goshopify "github.com/bold-commerce/go-shopify/v4"
+	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/devices"
+	"github.com/go-rod/rod/lib/launcher"
+	"github.com/go-rod/rod/lib/proto"
 	"os"
 	"strconv"
 	"strings"
-
-	goshopify "github.com/bold-commerce/go-shopify/v4"
-	"github.com/go-rod/rod"
-	"github.com/go-rod/rod/lib/proto"
 )
 
-func (app *application) RimanLogin(loginUrl string, username string, password string) (*rod.Page, *rod.Browser) {
-	browser := rod.New().MustConnect().DefaultDevice(devices.LaptopWithHiDPIScreen)
+func (app *application) RimanLogin(loginUrl string, rimanStoreName string, username string, password string) (*rod.Page, *rod.Browser, []*proto.NetworkCookie) {
+	// --allow-third-party-cookies
+	path, _ := launcher.LookPath()
 
-	page := browser.MustPage(loginUrl)
+	u := launcher.New().
+		Headless(false).
+		Devtools(true).
+		NoSandbox(true).
+		Bin(path).
+		MustLaunch()
 
-	page.MustElement("div.static-menu-item").MustClick()
-	page.MustElement("#mat-input-0").MustInput(username)
-	page.MustElement("#mat-input-1").MustInput(password)
-	page.MustElement(`[type="submit"]`).MustClick()
-
-	/*	page.MustWaitStable().MustScreenshot("a.png") */
-	// time.Sleep(time.Hour)
-
-	return page, browser
-}
-
-func (app *application) ProcessOrders(rimanStoreName string, loginUrl string, username string, password string, orders []goshopify.Order) {
-	orderCount := len(orders)
-
-	switch orderCount := orderCount; {
-	case orderCount == 1:
-		app.SubmitOrder(rimanStoreName, loginUrl, username, password, orders[0])
-	case orderCount > 1:
-		for _, order := range orders {
-			app.SubmitOrder(rimanStoreName, loginUrl, username, password, order)
-		}
-	}
-}
-
-func (app *application) SubmitOrder(rimanStoreName string, loginUrl string, username string, password string, order goshopify.Order) {
-
-	browser := rod.New().MustConnect().DefaultDevice(devices.LaptopWithHiDPIScreen)
+	browser := rod.New().ControlURL(u).MustConnect().DefaultDevice(devices.LaptopWithHiDPIScreen)
 
 	page := browser.MustPage(loginUrl)
 
@@ -53,6 +33,23 @@ func (app *application) SubmitOrder(rimanStoreName string, loginUrl string, user
 	page.MustElement(`[type="submit"]`).MustClick()
 
 	cookies := browser.MustGetCookies()
+	return page, browser, cookies
+}
+
+func (app *application) ProcessOrders(rimanStoreName string, browser *rod.Browser, cookies []*proto.NetworkCookie, orders []goshopify.Order) {
+	orderCount := len(orders)
+
+	switch orderCount := orderCount; {
+	case orderCount == 1:
+		app.SubmitOrder(rimanStoreName, browser, cookies, orders[0])
+	case orderCount > 1:
+		for _, order := range orders {
+			app.SubmitOrder(rimanStoreName, browser, cookies, order)
+		}
+	}
+}
+
+func (app *application) SubmitOrder(rimanStoreName string, browser *rod.Browser, cookies []*proto.NetworkCookie, order goshopify.Order) {
 
 	networkCookie := networkCookies(cookies)
 

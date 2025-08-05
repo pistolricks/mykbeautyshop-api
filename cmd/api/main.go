@@ -6,6 +6,8 @@ import (
 	"expvar"
 	"flag"
 	"fmt"
+	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/proto"
 	"github.com/joho/godotenv"
 	"github.com/pistolricks/kbeauty-api/internal/data"
 	"github.com/pistolricks/kbeauty-api/internal/mailer"
@@ -60,12 +62,15 @@ type config struct {
 }
 
 type application struct {
-	config config
-	logger *slog.Logger
-	envars *Envars
-	models data.Models
-	mailer mailer.Mailer
-	wg     sync.WaitGroup
+	config  config
+	logger  *slog.Logger
+	envars  *Envars
+	page    *rod.Page
+	browser *rod.Browser
+	cookies []*proto.NetworkCookie
+	models  data.Models
+	mailer  mailer.Mailer
+	wg      sync.WaitGroup
 }
 
 func main() {
