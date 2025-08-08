@@ -160,7 +160,7 @@ type Order struct {
 	ConvDiscount            float64 `json:"convDiscount"`
 	RefundAmount            float64 `json:"refundAmount"`
 	ConvRefund              float64 `json:"convRefund"`
-	SalesCampaignFK         string  `json:"salesCampaignFK,omitempty"`
+	SalesCampaignFK         int     `json:"salesCampaignFK,omitempty"`
 	Paidstatusfk            int     `json:"paidstatusfk"`
 	DeliveryDate            string  `json:"deliveryDate,omitempty"`
 	ShippingDetails         string  `json:"shippingDetails,omitempty"`
