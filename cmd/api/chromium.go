@@ -27,8 +27,6 @@ func (app *application) RimanLogin(loginUrl string, rimanStoreName string, usern
 
 	browser := rod.New().ControlURL(u).MustConnect().DefaultDevice(devices.LaptopWithHiDPIScreen)
 
-	defer browser.MustClose()
-
 	page := browser.MustPage(loginUrl)
 
 	page.MustElement("div.static-menu-item").MustClick()
@@ -41,11 +39,11 @@ func (app *application) RimanLogin(loginUrl string, rimanStoreName string, usern
 }
 
 func (app *application) HomePage(rimanStoreName string, page *rod.Page, browser *rod.Browser, cookies []*proto.NetworkCookie) (*rod.Page, *rod.Browser, []*proto.NetworkCookie, error) {
-	networkCookie := networkCookies(cookies)
+	// networkCookie := networkCookies(cookies)
 
 	homeUrl := fmt.Sprintf("https://mall.riman.com/%s/home", rimanStoreName)
 
-	page.MustSetCookies(networkCookie...)
+	// page.MustSetCookies(networkCookie...)
 
 	wait := page.MustWaitNavigation()
 	page.MustNavigate(homeUrl)
