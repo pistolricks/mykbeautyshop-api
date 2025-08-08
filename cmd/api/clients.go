@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/pistolricks/mykbeautyshop-api/internal/data"
 	"github.com/pistolricks/mykbeautyshop-api/internal/riman"
 	"github.com/pistolricks/mykbeautyshop-api/internal/validator"
-	"net/http"
 )
 
 func (app *application) findCookieValue() *string {
@@ -109,4 +110,55 @@ func (app *application) listClientsHandler(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
+}
+
+func (app *application) clientLogoutHandler(w http.ResponseWriter, r *http.Request) {
+
+	var input struct {
+		RimanStoreName string `json:"rimanStoreName"`
+		UserName       string `json:"userName"`
+		Password       string `json:"password"`
+		LoginUrl       string `json:"loginUrl"`
+	}
+
+	err := app.readJSON(w, r, &input)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	credentials := riman.Credentials{
+		UserName: input.UserName,
+		Password: input.Password,
+	}
+
+	v := validator.New()
+	data.ValidatePasswordPlaintext(v, credentials.Password)
+
+	if !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	if input.RimanStoreName == app.envars.RimanStoreName {
+		app.envars.RimanStoreName = ""
+	}
+	if input.UserName == app.envars.Username {
+		app.envars.Username = ""
+	}
+	if input.Password == app.envars.Password {
+		app.envars.Password = ""
+	}
+
+	if input.LoginUrl == app.envars.LoginUrl {
+		app.envars.LoginUrl = ""
+	}
+
+	isLoggedOut := app.RimanLogout()
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"logged_out": isLoggedOut}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+
 }

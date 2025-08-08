@@ -244,3 +244,14 @@ func (app *application) insertShippingInfo(browser *rod.Browser, page *rod.Page,
 	/* Need to add Province/State */
 	// page.MustElement("#state0").MustSelectAllText().MustInput(province)
 }
+
+func (app *application) RimanLogout() bool {
+	// --allow-third-party-cookies
+
+	if app.browser != nil {
+		p := app.browser
+		p.MustClose()
+	}
+
+	return true
+}
