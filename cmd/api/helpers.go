@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
-	"github.com/pistolricks/kbeauty-api/internal/validator"
+	"github.com/pistolricks/mykbeautyshop-api/internal/validator"
 	"io"
 	"net/http"
 	"net/url"

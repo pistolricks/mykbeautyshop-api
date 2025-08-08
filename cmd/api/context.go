@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/pistolricks/kbeauty-api/internal/data"
+	"github.com/pistolricks/mykbeautyshop-api/internal/data"
 	"net/http"
 )
 

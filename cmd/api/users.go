@@ -2,8 +2,8 @@ package main
 
 import (
 	"errors"
-	"github.com/pistolricks/kbeauty-api/internal/data"
-	"github.com/pistolricks/kbeauty-api/internal/validator"
+	"github.com/pistolricks/mykbeautyshop-api/internal/data"
+	"github.com/pistolricks/mykbeautyshop-api/internal/validator"
 	"net/http"
 )
 

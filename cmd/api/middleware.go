@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pistolricks/kbeauty-api/internal/data"
-	"github.com/pistolricks/kbeauty-api/internal/validator"
+	"github.com/pistolricks/mykbeautyshop-api/internal/data"
+	"github.com/pistolricks/mykbeautyshop-api/internal/validator"
 
 	"github.com/tomasen/realip"
 	"golang.org/x/time/rate"
