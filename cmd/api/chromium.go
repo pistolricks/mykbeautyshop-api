@@ -12,33 +12,6 @@ import (
 	"strings"
 )
 
-func (app *application) HomePage(rimanStoreName string, browser *rod.Browser, cookies []*proto.NetworkCookie) (*rod.Page, *rod.Browser, []*proto.NetworkCookie, error) {
-	networkCookie := networkCookies(cookies)
-
-	homeUrl := fmt.Sprintf("https://mall.riman.com/%s/home", rimanStoreName)
-
-	page := browser.MustPage(homeUrl)
-
-	page.MustSetCookies(networkCookie...)
-
-	wait := page.MustWaitNavigation()
-	page.MustNavigate(homeUrl)
-	wait()
-
-	app.page = page
-	app.browser = browser
-
-	newCookies, err := browser.GetCookies()
-	if err != nil {
-		fmt.Println(err)
-		return page, browser, newCookies, err
-	}
-
-	app.cookies = newCookies
-
-	return page, browser, newCookies, err
-}
-
 func (app *application) RimanLogin(loginUrl string, rimanStoreName string, username string, password string) (*rod.Page, *rod.Browser, []*proto.NetworkCookie) {
 	// --allow-third-party-cookies
 	path, _ := launcher.LookPath()
@@ -54,6 +27,8 @@ func (app *application) RimanLogin(loginUrl string, rimanStoreName string, usern
 
 	browser := rod.New().ControlURL(u).MustConnect().DefaultDevice(devices.LaptopWithHiDPIScreen)
 
+	defer browser.MustClose()
+
 	page := browser.MustPage(loginUrl)
 
 	page.MustElement("div.static-menu-item").MustClick()
@@ -65,54 +40,80 @@ func (app *application) RimanLogin(loginUrl string, rimanStoreName string, usern
 	return page, browser, cookies
 }
 
-func (app *application) ProcessOrders(rimanStoreName string, browser *rod.Browser, cookies []*proto.NetworkCookie, orders []goshopify.Order) {
+func (app *application) HomePage(rimanStoreName string, page *rod.Page, browser *rod.Browser, cookies []*proto.NetworkCookie) (*rod.Page, *rod.Browser, []*proto.NetworkCookie, error) {
+	networkCookie := networkCookies(cookies)
+
+	homeUrl := fmt.Sprintf("https://mall.riman.com/%s/home", rimanStoreName)
+
+	page.MustSetCookies(networkCookie...)
+
+	wait := page.MustWaitNavigation()
+	page.MustNavigate(homeUrl)
+	wait()
+
+	app.page = page
+	app.browser = browser
+
+	newCookies, err := browser.GetCookies()
+	if err != nil {
+		fmt.Println(err)
+		app.cookies = newCookies
+		return page, browser, newCookies, err
+	}
+
+	app.cookies = newCookies
+
+	return page, browser, newCookies, err
+}
+
+func (app *application) ProcessOrders(rimanStoreName string, page *rod.Page, browser *rod.Browser, cookies []*proto.NetworkCookie, orders []goshopify.Order) {
 	orderCount := len(orders)
 
 	switch orderCount := orderCount; {
 	case orderCount == 1:
-		app.SubmitOrder(rimanStoreName, browser, cookies, orders[0])
+		app.SubmitOrder(rimanStoreName, page, browser, cookies, orders[0])
 	case orderCount > 1:
 		for _, order := range orders {
-			app.SubmitOrder(rimanStoreName, browser, cookies, order)
+			app.SubmitOrder(rimanStoreName, page, browser, cookies, order)
 		}
 	}
 }
 
-func (app *application) SubmitOrder(rimanStoreName string, browser *rod.Browser, cookies []*proto.NetworkCookie, order goshopify.Order) {
-
-	networkCookie := networkCookies(cookies)
+func (app *application) SubmitOrder(rimanStoreName string, page *rod.Page, browser *rod.Browser, cookies []*proto.NetworkCookie, order goshopify.Order) {
 
 	count := len(order.LineItems)
 
 	for i, product := range order.LineItems {
 		productUrl := fmt.Sprintf("https://mall.riman.com/%s/products/%s", rimanStoreName, product.SKU)
 
-		page := browser.MustPage(productUrl)
-
-		page.MustSetCookies(networkCookie...)
-
 		wait := page.MustWaitNavigation()
-		page.MustNavigate(productUrl)
+		page.MustNavigate(productUrl) // := browser.MustPage(productUrl)
 		wait()
 
 		page.MustElement("input.quantity-input").MustSelectAllText().MustInput(strconv.Itoa(product.Quantity))
 		page.MustElement("button.add-to-bag-btn").MustClick()
 		page.MustWaitStable()
 
-		switch {
-		case i < count-1:
-			page.MustElement("div.cart-btn").MustClick()
-		case i == count-1:
+		fmt.Println("QTY, and Index")
+		println(i + 1)
+		println(count)
+		/*
+			switch {
+			case i < count-1:
+				page.MustElement("div.cart-btn").MustClick()
+			case i == count-1:
 
-			cookies, err := browser.GetCookies()
-			if err != nil {
-				return
+				cookies, err := browser.GetCookies()
+				if err != nil {
+					return
+				}
+
+				app.processShipping(browser, page, cookies, order)
+
 			}
+		*/
 
-			app.processShipping(browser, page, cookies, order)
-
-		}
-
+		app.processShipping(browser, page, cookies, order)
 	}
 }
 
@@ -173,25 +174,25 @@ type StateObject = struct {
 
 func (app *application) insertShippingInfo(browser *rod.Browser, page *rod.Page, checkoutUrl string, order goshopify.Order) {
 
-	p := browser.MustPage(checkoutUrl)
+	/*
+		p := browser.MustPage(checkoutUrl)
 
-	newCookies, err := browser.GetCookies()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+		newCookies, err := browser.GetCookies()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 
-	networkCookie := networkCookies(newCookies)
+		networkCookie := networkCookies(newCookies)
 
-	p.MustSetCookies(networkCookie...)
+		p.MustSetCookies(networkCookie...)
 
-	wait := p.MustWaitNavigation()
-	p.MustNavigate(checkoutUrl)
-	wait()
+		wait := p.MustWaitNavigation()
+		p.MustNavigate(checkoutUrl)
+		wait()
+	*/
 
-	app.page = p
-	app.browser = browser
-	app.cookies = newCookies
+	page.MustNavigate(checkoutUrl)
 
 	shippingAddress := order.ShippingAddress
 
@@ -210,8 +211,8 @@ func (app *application) insertShippingInfo(browser *rod.Browser, page *rod.Page,
 	phone := strings.Replace(strings.TrimSpace(shippingAddress.Phone), "+1", "", 1)
 	// email := strings.TrimSpace(order.Email)
 
-	p.MustElement("#firstName0").MustSelectAllText().MustInput(firstName)
-	p.MustElement("#lastName0").MustSelectAllText().MustInput(lastName)
+	page.MustElement("#firstName0").MustSelectAllText().MustInput(firstName)
+	page.MustElement("#lastName0").MustSelectAllText().MustInput(lastName)
 
 	removedAddress2 := strings.Replace(address1, address2, "", 1)
 	removedCity := strings.Replace(removedAddress2, city, "", 1)
@@ -224,17 +225,17 @@ func (app *application) insertShippingInfo(browser *rod.Browser, page *rod.Page,
 
 	address := fmt.Sprintf("%s %s, %s", formattedAddress, address2, shortZip)
 
-	p.MustElement("#address10").MustSelectAllText().MustInput(address)
-	p.MustElement("#address20").MustSelectAllText().MustInput(company)
+	page.MustElement("#address10").MustSelectAllText().MustInput(address)
+	page.MustElement("#address20").MustSelectAllText().MustInput(company)
 
-	p.MustElement("#city0").MustSelectAllText().MustInput(city)
-	// p.MustElement("#state0").MustSelect(provinceCode)
-	p.MustElement("#postalCode0").MustSelectAllText().MustInput(zip)
+	page.MustElement("#city0").MustSelectAllText().MustInput(city)
+	// page.MustElement("#state0").MustSelect(provinceCode)
+	page.MustElement("#postalCode0").MustSelectAllText().MustInput(zip)
 
-	p.MustElement("#phoneNumber0").MustSelectAllText().MustInput(phone)
+	page.MustElement("#phoneNumber0").MustSelectAllText().MustInput(phone)
 	email := os.Getenv("ACCOUNT_EMAIL")
-	p.MustElement("#email0").MustSelectAllText().MustInput(email)
+	page.MustElement("#email0").MustSelectAllText().MustInput(email)
 
 	/* Need to add Province/State */
-	// p.MustElement("#state0").MustSelectAllText().MustInput(province)
+	// page.MustElement("#state0").MustSelectAllText().MustInput(province)
 }

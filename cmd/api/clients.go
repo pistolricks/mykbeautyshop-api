@@ -6,7 +6,6 @@ import (
 	"github.com/pistolricks/kbeauty-api/internal/riman"
 	"github.com/pistolricks/kbeauty-api/internal/validator"
 	"net/http"
-	"os"
 )
 
 func (app *application) findCookieValue() *string {
@@ -20,33 +19,6 @@ func (app *application) findCookieValue() *string {
 	}
 	// Return nil if no product is found
 	return nil
-}
-
-func (app *application) homePageHandler(w http.ResponseWriter, r *http.Request) {
-
-	rimanStoreName := os.Getenv("RIMAN_STORE_NAME")
-	rimanRid := os.Getenv("USERNAME")
-	rimanUrl := os.Getenv("LOGIN_URL")
-	currentBrowser := app.browser
-	currentCookies := app.cookies
-
-	app.envars.RimanStoreName = rimanStoreName
-	app.envars.LoginUrl = rimanUrl
-	app.envars.Username = rimanRid
-
-	page, browser, cookies, _ := app.HomePage(rimanStoreName, currentBrowser, currentCookies)
-
-	fmt.Println(cookies)
-
-	token := app.findCookieValue()
-	fmt.Println("TOKEN")
-	fmt.Println(token)
-
-	err := app.writeJSON(w, http.StatusOK, envelope{"page": page, "browser": browser, "cookies": cookies, "rid": rimanRid, "store": rimanStoreName, "url": rimanUrl}, nil)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-	}
-
 }
 
 func (app *application) clientLoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -82,18 +54,43 @@ func (app *application) clientLoginHandler(w http.ResponseWriter, r *http.Reques
 	app.envars.Password = credentials.Password
 	app.envars.LoginUrl = input.LoginUrl
 
-	err = os.Setenv("RIMAN_STORE_NAME", input.RimanStoreName)
-	err = os.Setenv("LOGIN_URL", input.LoginUrl)
-	err = os.Setenv("USERNAME", credentials.UserName)
-	err = os.Setenv("Password", credentials.Password)
+	// err = os.Setenv("RIMAN_STORE_NAME", input.RimanStoreName)
+	// err = os.Setenv("LOGIN_URL", input.LoginUrl)
+	// err = os.Setenv("USERNAME", credentials.UserName)
+	// err = os.Setenv("Password", credentials.Password)
 
 	page, browser, cookies := app.RimanLogin(input.LoginUrl, input.RimanStoreName, credentials.UserName, credentials.Password)
+
 	app.page = page
 	app.browser = browser
 	app.cookies = cookies
 	fmt.Println(browser)
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"page": app.page, "browser": app.browser, "cookies": app.cookies}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+
+}
+
+func (app *application) homePageHandler(w http.ResponseWriter, r *http.Request) {
+
+	rimanStoreName := app.envars.RimanStoreName // os.Getenv("RIMAN_STORE_NAME")
+	rimanRid := app.envars.Username             // os.Getenv("USERNAME")
+	rimanUrl := app.envars.LoginUrl             // os.Getenv("LOGIN_URL")
+	currentPage := app.page
+	currentBrowser := app.browser
+	currentCookies := app.cookies
+
+	page, browser, cookies, _ := app.HomePage(rimanStoreName, currentPage, currentBrowser, currentCookies)
+
+	fmt.Println(cookies)
+
+	token := app.findCookieValue()
+	fmt.Println("TOKEN")
+	fmt.Println(token)
+
+	err := app.writeJSON(w, http.StatusOK, envelope{"page": page, "browser": browser, "cookies": cookies, "rid": rimanRid, "store": rimanStoreName, "url": rimanUrl}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

@@ -9,7 +9,6 @@ import (
 	"github.com/pistolricks/kbeauty-api/internal/riman"
 	"github.com/pistolricks/kbeauty-api/internal/shopify"
 	"net/http"
-	"os"
 )
 
 /* ORDER STATUS */
@@ -131,14 +130,14 @@ func (app *application) processShopifyOrder(w http.ResponseWriter, r *http.Reque
 
 	count := len(input.Orders)
 
-	rimanStoreName := os.Getenv("RIMAN_STORE_NAME")
+	rimanStoreName := app.envars.RimanStoreName
 	if rimanStoreName == "" {
 		fmt.Println("missing riman store name")
 		return
 	}
 
 	app.background(func() {
-		app.ProcessOrders(rimanStoreName, app.browser, app.cookies, orders)
+		app.ProcessOrders(rimanStoreName, app.page, app.browser, app.cookies, orders)
 	})
 
 	currentBrowser := app.browser
@@ -190,32 +189,32 @@ func (app *application) processShopifyOrders(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	rimanStoreName := os.Getenv("RIMAN_STORE_NAME")
+	rimanStoreName := app.envars.RimanStoreName // os.Getenv("RIMAN_STORE_NAME")
 	if rimanStoreName == "" {
 		fmt.Println("missing riman store name")
 		return
 	}
 
-	loginUrl := os.Getenv("LOGIN_URL")
+	loginUrl := app.envars.LoginUrl // os.Getenv("LOGIN_URL")
 	if loginUrl == "" {
 		fmt.Println("missing login url")
 		return
 	}
 
-	username := os.Getenv("USERNAME")
+	username := app.envars.Username // os.Getenv("USERNAME")
 	if username == "" {
 		fmt.Println("missing username")
 		return
 	}
 
-	password := os.Getenv("PASSWORD")
+	password := app.envars.Password // os.Getenv("PASSWORD")
 	if password == "" {
 		fmt.Println("missing password")
 		return
 	}
 
 	app.background(func() {
-		app.ProcessOrders(rimanStoreName, app.browser, app.cookies, orders)
+		app.ProcessOrders(rimanStoreName, app.page, app.browser, app.cookies, orders)
 	})
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"orders": orders, "count": count}, nil)
@@ -304,7 +303,7 @@ func (app *application) listShopifyOrders(w http.ResponseWriter, r *http.Request
 
 func (app *application) listRimanOrders(w http.ResponseWriter, r *http.Request) {
 
-	orderResponse, err := riman.GetOrders(app.envars.Token, app.cookies)
+	orderResponse, err := riman.GetOrders(app.envars.Username, app.envars.Token, app.cookies)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/go-rod/rod/lib/proto"
 	"net/http"
-	"os"
 	"resty.dev/v3"
 	"time"
 )
@@ -78,11 +77,11 @@ func restyCookies(cookies []*proto.NetworkCookie) []*http.Cookie {
 	return updatedCookies
 }
 
-func GetOrders(token string, cookies []*proto.NetworkCookie) (*OrderResponse, error) {
+func GetOrders(username string, token string, cookies []*proto.NetworkCookie) (*OrderResponse, error) {
 	client := resty.New()
 	defer client.Close()
 
-	mainSiteUrl := os.Getenv("USERNAME")
+	mainSiteUrl := username
 	updatedCookies := restyCookies(cookies)
 
 	url := fmt.Sprintf("https://cart-api.riman.com/api/v1/orders")
