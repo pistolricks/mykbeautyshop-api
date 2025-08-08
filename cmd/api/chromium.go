@@ -2,18 +2,25 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strconv"
+	"strings"
+
 	goshopify "github.com/bold-commerce/go-shopify/v4"
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/devices"
 	"github.com/go-rod/rod/lib/launcher"
 	"github.com/go-rod/rod/lib/proto"
-	"os"
-	"strconv"
-	"strings"
 )
 
 func (app *application) RimanLogin(loginUrl string, rimanStoreName string, username string, password string) (*rod.Page, *rod.Browser, []*proto.NetworkCookie) {
 	// --allow-third-party-cookies
+
+	if app.browser != nil {
+		p := app.browser
+		p.MustClose()
+	}
+
 	path, _ := launcher.LookPath()
 
 	// homeUrl := fmt.Sprintf("https://mall.riman.com/%s/home", rimanStoreName)
