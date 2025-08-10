@@ -26,7 +26,7 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodPost, "/v1/process/order", app.processShopifyOrder)
 
 	router.HandlerFunc(http.MethodGet, "/v1/process/order/billing", app.inputBillingHandler)
-
+	router.HandlerFunc(http.MethodGet, "/v1/process/order/cart", app.getCartHandler)
 	router.HandlerFunc(http.MethodGet, "/v1/riman/orders", app.listRimanOrders)
 	router.HandlerFunc(http.MethodGet, "/v1/riman/shipment", app.getShipmentHandler)
 	router.HandlerFunc(http.MethodGet, "/v1/riman/tracking", app.trackingHandler)

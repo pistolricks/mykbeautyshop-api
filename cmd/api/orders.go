@@ -3,12 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
+
 	goshopify "github.com/bold-commerce/go-shopify/v4"
 	"github.com/joho/godotenv"
 	"github.com/pistolricks/mykbeautyshop-api/internal/data"
 	"github.com/pistolricks/mykbeautyshop-api/internal/riman"
 	"github.com/pistolricks/mykbeautyshop-api/internal/shopify"
-	"net/http"
 )
 
 /* ORDER STATUS */
@@ -312,6 +313,17 @@ func (app *application) listRimanOrders(w http.ResponseWriter, r *http.Request) 
 	count := orderResponse.TotalCount
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"orders": orders, "count": count}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+
+}
+
+func (app *application) getCartHandler(w http.ResponseWriter, r *http.Request) {
+
+	cart, err := riman.GetCart(app.session.CartKey)
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"cart": cart, "error": err}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

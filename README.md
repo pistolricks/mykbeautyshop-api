@@ -58,7 +58,7 @@ GetRimanDollarsBalance=https://cart-api.riman.com/api/v1/order/getRimanDollarsBa
 
 
 
-PostOrder=https://cart-api.riman.com/api/v2/order 
+PostOrder=https://cart-api.riman.com/api/v2/order
 payload [
 cartKey: "72357ede-62c0-4e03-9904-f47be1a7f900"
 countryCode: "US"
@@ -75,4 +75,3 @@ GetOrders=https://cart-api.riman.com/api/v1/orders?mainSiteUrl=2043124962&getEnr
 GetShipping=https://cart-api.riman.com/api/v1/orders/{OrderNumber}/shipment-products
 
 ## Don't forget the Processes in Excalidraw
-
