@@ -8,7 +8,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/pistolricks/kbeauty-api/internal/validator"
+	"github.com/pistolricks/mykbeautyshop-api/internal/validator"
 )
 
 const (

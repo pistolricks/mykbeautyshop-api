@@ -5,9 +5,9 @@ import (
 	"fmt"
 	goshopify "github.com/bold-commerce/go-shopify/v4"
 	"github.com/joho/godotenv"
-	"github.com/pistolricks/kbeauty-api/internal/data"
-	"github.com/pistolricks/kbeauty-api/internal/riman"
-	"github.com/pistolricks/kbeauty-api/internal/shopify"
+	"github.com/pistolricks/mykbeautyshop-api/internal/data"
+	"github.com/pistolricks/mykbeautyshop-api/internal/riman"
+	"github.com/pistolricks/mykbeautyshop-api/internal/shopify"
 	"net/http"
 )
 

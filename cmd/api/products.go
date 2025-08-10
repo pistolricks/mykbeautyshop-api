@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	goshopify "github.com/bold-commerce/go-shopify/v4"
-	"github.com/pistolricks/kbeauty-api/internal/riman"
-	"github.com/pistolricks/kbeauty-api/internal/shopify"
+	"github.com/pistolricks/mykbeautyshop-api/internal/riman"
+	"github.com/pistolricks/mykbeautyshop-api/internal/shopify"
 	"net/http"
 )
 

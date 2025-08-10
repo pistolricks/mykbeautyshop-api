@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/pistolricks/kbeauty-api/internal/data"
-	"github.com/pistolricks/kbeauty-api/internal/riman"
-	"github.com/pistolricks/kbeauty-api/internal/validator"
+	"github.com/pistolricks/mykbeautyshop-api/internal/data"
+	"github.com/pistolricks/mykbeautyshop-api/internal/riman"
+	"github.com/pistolricks/mykbeautyshop-api/internal/validator"
 )
 
 type RimanBillingAddress struct {
